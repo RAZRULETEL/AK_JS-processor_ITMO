@@ -1,0 +1,6 @@
+# Project exclude paths
+/byte-code.js
+/byte-code.js.map
+/translator.js
+/translator.js.map
+/.idea
