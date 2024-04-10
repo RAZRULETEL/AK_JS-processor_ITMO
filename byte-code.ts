@@ -1,0 +1,63 @@
+
+
+interface MemoryCell {
+    value: Instruction | Data;
+    address: number;
+}
+
+export interface Address{
+    addressing: 'stack' | 'relative';
+    value: number;
+}
+
+export interface TargetAddress{
+    type: 'variable' | 'function' | 'stack';
+    name: string;
+}
+
+export interface Instruction {
+    line: number;
+    source: string;
+    opcode: Opcode;
+    arg: TargetAddress | Address | Register | number;
+}
+
+interface Data {
+    value: number;
+}
+
+export enum Register {
+    ACC = 0, // accumulator
+    IP = 1, // instruction pointer
+    SP = 2, // stack pointer
+    BR = 3, // buffer register
+    DR = 4, // data register | read-write from memory
+    PR = 5, // program register
+}
+
+export enum Opcode {
+    NOP = 0,
+    PUSH = 1,
+    POP = 2,
+    ADD = 3,
+    SUB = 4,
+    MUL = 5,
+    DIV = 6,
+    MOD = 7,
+    EQ = 8,
+    NEQ = 9,
+    GT = 10,
+    LT = 11,
+    GE = 12,
+    LE = 13,
+    JMP = 14,
+    JZ = 15,
+    JNZ = 16,
+    CALL = 17,
+    RET = 18,
+    INC = 19,
+    DEC = 20,
+    CMP = 21,
+    HALT = 22,
+    LD = 23,
+}
