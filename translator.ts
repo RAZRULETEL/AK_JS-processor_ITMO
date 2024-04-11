@@ -20,6 +20,14 @@ const ComparisonOperator = {
     ">=": Opcode.GE
 }
 
+const MathOperators = {
+    "+": Opcode.ADD,
+    "-": Opcode.SUB,
+    "*": Opcode.MUL,
+    "/": Opcode.DIV,
+    "%": Opcode.DIV,
+}
+
 /**
  * Environment that contains accessible variables and parent environment
  * Have functional visibility - new function => new environment
@@ -120,11 +128,11 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
     return result;
 }
 
-function cut_expression(input_data: string): string {
-    let lvl = 1;
-    let i = 1;
+function cut_expression(input_data: string, save_brackets: boolean = true): string {
+    let lvl = 0;
+    let i = 0;
     let is_string = false;
-    while (lvl > 0) {
+    do {
         let match;
         if (!is_string && (match = input_data.substring(i).match(/^\s+/))) {
             const is_bracket_close = input_data[i - 1] == "(" || input_data[i + match[0].length] == ")";
@@ -143,31 +151,37 @@ function cut_expression(input_data: string): string {
 
         i++;
 
-        if(i > input_data.length)
+        if (i > input_data.length)
             throw new Error("Expression not closed: " + input_data);
-    }
-    return input_data.substring(0, i);
+    } while (lvl > 0)
+    return input_data.substring(save_brackets ? 0 : 1, i - +!save_brackets);
 }
 
-function expression_to_parts(input_data: string): {action: string, first: string, second: string}{
-    if(!input_data.startsWith("("))
+function expression_to_parts(input_data: string): { action: string, first: string, second: string, third?: string } {
+    if (!input_data.startsWith("("))
         throw new Error("Expression must starts with '(': " + input_data);
-    input_data = cut_expression(input_data.substring(1));
+    input_data = cut_expression(input_data, false);
     const action = input_data.split(" ", 1)[0];
 
     let first_expression = input_data.substring(action.length + 1);
-    if(first_expression.startsWith("("))
+    if (first_expression.startsWith("("))
         first_expression = cut_expression(first_expression);
     else
         first_expression = input_data.split(" ", 2)[1];
 
     let second_expression = input_data.substring(action.length + 1 + first_expression.length + 1);
-    if(first_expression.startsWith("("))
+    if (second_expression.startsWith("("))
         second_expression = cut_expression(second_expression);
-    else
-        second_expression = second_expression.substring(0, second_expression.length - 1);
 
-    return {action: action, first: first_expression, second: second_expression};
+    let third_expression = input_data.substring(action.length + 1 + first_expression.length + 1 + second_expression.length).trim();
+    if (third_expression) {
+        if (third_expression.startsWith("("))
+            third_expression = cut_expression(third_expression);
+    } else
+        third_expression = undefined;
+
+
+    return {action: action, first: first_expression, second: second_expression, third: third_expression};
 }
 
 function function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
@@ -216,22 +230,19 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
 }
 
 
-function parse_math(input_data: string, lexical_environment: LexicalEnvironment): Instruction[]{
-    const math_match = input_data.substring(1).match(/^\s*[><=+\-*\/]{1,2}\s/);
+function parse_math(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    let {action, first, second} = expression_to_parts(input_data);
 
-    if(!math_match) return [];
+    if (MathOperators[action] == undefined) return [];
     input_data = input_data.substring(1, input_data.length - 1);
 
     const result: Instruction[] = [];
 
-    let first_value = input_data.substring(math_match.length).trim();
-    if(first_value.startsWith("(")) {
-        first_value = cut_expression(first_value.substring(1));
-        result.push(...parse(first_value, lexical_environment));
-    }else {
-        first_value = first_value.split(" ", 1)[0];
-        result.push(load_value(first_value, lexical_environment));
-    }
+    if (first.startsWith("("))
+        result.push(...parse(first, lexical_environment));
+    else
+        result.push(load_value(first, lexical_environment));
+
     result.push({
         line: 0,
         source: "",
@@ -239,11 +250,10 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
         arg: 0
     });
 
-    const second_value = input_data.substring(math_match.length + first_value.length).trim();
-    if(second_value.startsWith("("))
-        result.push(...parse(second_value, lexical_environment));
+    if (second.startsWith("("))
+        result.push(...parse(second, lexical_environment));
     else
-        result.push(load_value(second_value.split(" ", 1)[0], lexical_environment));
+        result.push(load_value(second.split(" ", 1)[0], lexical_environment));
 
     result.push({
         line: 0,
