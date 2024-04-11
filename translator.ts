@@ -52,9 +52,9 @@ const mappings: { [key: string]: number } = {}; // functions address mapping
 const functions: Instruction[][] = [];
 
 console.log(translate("((                  function                  factorial (x     h     k)" +
-    "          (if                 (>=   x     0) ()          (* x (factorial (- x 1))))) (function test(a b c)(print a)))"), mappings);
+    "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)))"), mappings);
 
-console.log(expression_to_parts("(>=   a     (                 print           a              )       )"));
+// console.log(expression_to_parts("(>=  (                 print           a              )     (                 print           a              )  (                 print           a              )  )"));
 
 // Translate the input file.
 function translate(input_data: string): Instruction[] {
@@ -67,7 +67,7 @@ function translate(input_data: string): Instruction[] {
 
     try {
         input_data = cut_expression(input_data.trim(), false);
-    }catch (e) {
+    } catch (e) {
         throw new Error("Invalid input file.\n" + e);
     }
 
@@ -84,7 +84,8 @@ function translate(input_data: string): Instruction[] {
 }
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
-    console.log("Parse ", !!lexical_environment.parent);
+    console.log("Parse ", !!lexical_environment.parent, input_data);
+    if (!input_data.trim()) return [];
     const match = input_data.substring(1).match(/^\s*\w+/);
 
     const expression = cut_expression(input_data);
@@ -234,7 +235,6 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
     let {action, first, second} = expression_to_parts(input_data);
 
     if (MathOperators[action] == undefined) return [];
-    input_data = input_data.substring(1, input_data.length - 1);
 
     const result: Instruction[] = [];
 
@@ -270,7 +270,7 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
  * @param input_data
  * @param lexical_environment
  */
-function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[]{
+function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
     const condition = input_data[4] != "(" ? input_data.substring(4).match(/^\w+/)[0] : cut_expression(input_data.substring(4));
 
@@ -278,9 +278,9 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
 
     if (condition.startsWith("(")) { // condition is an expression
         const args = condition.substring(1, condition.length - 1).split(" ");
-        if(args.length != 3)
+        if (args.length != 3)
             throw new Error("Invalid arguments count: " + args.length + ", expected 3.");
-        if(ComparisonOperator[args[0]] == undefined)
+        if (ComparisonOperator[args[0]] == undefined)
             throw new Error("Invalid comparison operator: " + args[0]);
         result.push(load_value(args[1], lexical_environment));
         result.push(load_value(args[2], lexical_environment, true));
@@ -291,14 +291,16 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
             arg: 0
         }
     } else { // condition is a variable or constant
-        if(condition == "true" || condition == "false") {
+        if (condition == "false") {
             jmp = {
                 line: 0,
                 source: "",
                 opcode: Opcode.JMP,
                 arg: 0
             }
-        }else {
+        } else if (condition == "true") {
+            jmp = null;
+        } else {
             result.push(load_value(condition, lexical_environment));
             jmp = {
                 line: 0,
@@ -308,9 +310,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
             }
         }
     }
-    result.push(jmp);
-
-    const jmp_index = result.length - 1;
+    jmp && result.push(jmp);
 
     const positive = cut_expression(input_data.substring(5 + condition.length));
     const positive_branch = parse_code_branch(positive);
@@ -323,30 +323,30 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
         arg: 0
     };
     result.push(positive_end_jmp);
-    jmp.arg = { addressing: "relative", value: positive_branch.length + 1};
+    jmp && (jmp.arg = {addressing: "relative", value: positive_branch.length + 1});
 
     const negative = cut_expression(input_data.substring(6 + condition.length + positive.length));
     const negative_branch = parse_code_branch(negative);
     result.push(...negative_branch);
 
-    positive_end_jmp.arg = { addressing: "relative", value: negative_branch.length};
+    positive_end_jmp.arg = {addressing: "relative", value: negative_branch.length};
 
     return result;
 
-    function parse_code_branch(input: string): Instruction[]{
+    function parse_code_branch(input: string): Instruction[] {
         input = input.substring(1, input.length - 1);
-        if(!input) return [];
+        if (!input) return [];
 
         const result: Instruction[] = [];
 
-        if(input.startsWith("(")){// Multiple expressions
-            while (input.length > 0){
+        if (input.startsWith("(")) {// Multiple expressions
+            while (input.length > 0) {
                 console.log(input);
                 const expression = cut_expression(input);
                 result.push(...parse(expression, lexical_environment));
                 input = input.substring(expression.length);
             }
-        }else{// Single expression
+        } else {// Single expression
             result.push(...parse(`(${input})`, lexical_environment));
         }
 
@@ -357,26 +357,24 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
 }
 
 
-
 function load_value(variable: string, lexical_environment: LexicalEnvironment, compare_only: boolean = false): Instruction {
     if (isNaN(+variable))
         if (lexical_environment.variables.indexOf(variable) == -1)
             throw new Error("Variable " + variable + " is not defined.");
+        else if (lexical_environment.parent == null)
+            return {
+                line: 0,
+                source: "load " + variable,
+                opcode: compare_only ? Opcode.CMP : Opcode.LD,
+                arg: {type: 'variable', name: variable}
+            }
         else
-            if(lexical_environment.parent == null)
-                return {
-                    line: 0,
-                    source: "load " + variable,
-                    opcode: compare_only ? Opcode.CMP : Opcode.LD,
-                    arg: {type: 'variable', name: variable}
-                }
-            else
-                return {
-                    line: 0,
-                    source: "load " + variable,
-                    opcode: compare_only ? Opcode.CMP : Opcode.LD,
-                    arg: {type: 'stack', name: variable}
-                }
+            return {
+                line: 0,
+                source: "load " + variable,
+                opcode: compare_only ? Opcode.CMP : Opcode.LD,
+                arg: {type: 'stack', name: variable}
+            }
     else
         return {
             line: 0,
