@@ -65,19 +65,19 @@ function translate(input_data: string): Instruction[] {
         variables: ["x"]
     };
 
+    try {
+        input_data = cut_expression(input_data.trim(), false);
+    }catch (e) {
+        throw new Error("Invalid input file.\n" + e);
+    }
 
-    input_data = input_data.trim();
-    if (!input_data.startsWith("(") || !input_data.endsWith(")"))
-        throw new Error("Invalid input file.");
-
-    input_data = input_data.substring(1).trim();
-    if(input_data.startsWith("(")){
-        while (!input_data.match(/^(\)|\s)*\)$/)){
-            const expression = cut_expression(input_data).trim();
+    if (input_data.startsWith("(")) {
+        while (input_data) {
+            const expression = cut_expression(input_data);
             result.push(...parse(expression, root));
-            input_data = input_data.substring(expression.length);
+            input_data = input_data.substring(expression.length).trim();
         }
-    }else
+    } else
         result.push(...parse(input_data, root));
 
     return result.concat(functions.flatMap(e => e));
@@ -90,39 +90,39 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
     const expression = cut_expression(input_data);
 
     const result: Instruction[] = [];
-    if(match)
-    switch (match[0].trim()) {
-        case Syntax.IF:
-            result.push(...parse_if(expression, lexical_environment));
-            break;
-        case Syntax.WHILE:
-            break;
-        case Syntax.FUNCTION:
-            if(lexical_environment.parent != null)
-                throw new Error("Nested functions not supported!");
-            function_definition(expression, lexical_environment);
-            break;
-        case Syntax.RETURN:
-            break;
-        case Syntax.SET:
+    if (match)
+        switch (match[0].trim()) {
+            case Syntax.IF:
+                result.push(...parse_if(expression, lexical_environment));
+                break;
+            case Syntax.WHILE:
+                break;
+            case Syntax.FUNCTION:
+                if (lexical_environment.parent != null)
+                    throw new Error("Nested functions not supported!");
+                function_definition(expression, lexical_environment);
+                break;
+            case Syntax.RETURN:
+                break;
+            case Syntax.SET:
 
-            if(lexical_environment.variables.indexOf("") > 0)
-            lexical_environment.variables.push();
-            break;
-        case Syntax.PRINT:
-            break;
-        default:
-            if(match && mappings[match[0]] != undefined){
-                result.push({
-                    line: 0,
-                    source: "call " + match[0],
-                    opcode: Opcode.CALL,
-                    arg: {type: 'function', name: match[0]}
-                })
-            }
-            break;
-    }
-    else{
+                if (lexical_environment.variables.indexOf("") > 0)
+                    lexical_environment.variables.push();
+                break;
+            case Syntax.PRINT:
+                break;
+            default:
+                if (match && mappings[match[0]] != undefined) {
+                    result.push({
+                        line: 0,
+                        source: "call " + match[0],
+                        opcode: Opcode.CALL,
+                        arg: {type: 'function', name: match[0]}
+                    })
+                }
+                break;
+        }
+    else {
         result.push(...parse_math(input_data, lexical_environment));
     }
     return result;
@@ -194,10 +194,10 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     const name = input_data.substring(offset).match(/^\w+/)[0];
     offset += name.length;
 
-    console.log("Define", name);
-
-    let args: string = input_data.substring(offset).match(/(\w+|\([^)]+\))/)[0];
-    offset += args.length + 2;
+    let args: string = input_data.substring(offset).match(/^\s*(\w+|\([^)]+\))\s*/)[0];
+    offset += args.length;
+    console.log("Define", name + '|' + args + '|' + input_data.substring(offset));
+    args = args.trim();
     if (args.startsWith("(")) {
         environment.variables.push(...args.substring(1, args.length - 1).split(" "));
     } else {
@@ -212,7 +212,7 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
         let i = 1 + body[body.length - 1].source.length;
         while (input_data[i] != ")") {
             body.push(...parse(input_data.substring(offset), environment));
-            i += body[body.length - 1].source.length;
+            throw new Error("Not implemented!"); // TODO
         }
     } else {
         body.push(...parse(input_data.substring(offset), environment));
