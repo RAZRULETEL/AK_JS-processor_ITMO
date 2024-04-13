@@ -1,4 +1,4 @@
-# Компилятор + процессор на TS
+# Компилятор + процессор на TS [![Super-Linter](https://github.com/RAZRULETEL/AK_JS-processor_ITMO/actions/workflows/super-linter.yml/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 Вариант: `lisp -> asm | acc | neum | hw | tick -> instr | struct | stream | mem | pstr | prob1 | cache`
 

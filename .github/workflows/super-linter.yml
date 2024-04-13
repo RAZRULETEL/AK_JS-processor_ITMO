@@ -24,8 +24,11 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter@v4
         env:
-          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          LINTER_RULES_PATH: /
+
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          VALIDATE_TYPESCRIPT_STANDARD: false
+
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
