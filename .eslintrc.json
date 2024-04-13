@@ -1,0 +1,63 @@
+{
+	"env": {
+		"browser": true,
+		"node": true,
+		"es2020": true
+	},
+	"extends": [
+		"eslint:all",
+		"plugin:@typescript-eslint/strict-type-checked"
+	],
+	"parserOptions": {
+		"project": ["tsconfig.json"]
+	},
+	"ignorePatterns": [
+		"*.md",
+		"*.map"
+	],
+	"parser": "@typescript-eslint/parser",
+	"rules": {
+		"no-magic-numbers": ["error", {"ignore":  [0, 1]}],
+		"max-statements": ["error", 15, { "ignoreTopLevelFunctions": true }],
+		"no-use-before-define": ["error", {
+			"functions": false,
+			"classes": true,
+			"variables": true
+		}],
+		"@typescript-eslint/restrict-template-expressions": ["error", {
+			"allowBoolean": true,
+			"allowNullish": true,
+			"allowNumber": true
+		}],
+		"no-warning-comments": "warn",
+		"no-negated-condition": "warn",
+
+//		"@typescript-eslint/strict-boolean-expressions": "off", //
+		"@typescript-eslint/no-unsafe-enum-comparison": "off", // Breaks switch/case
+		"@typescript-eslint/no-unnecessary-condition": "off", // Stupid, thinks null is true
+
+		"func-style": "off",
+		"prefer-destructuring": "off",
+
+		"camelcase": "off",
+		"sort-keys": "off",
+		"prefer-named-capture-group": "off",
+
+		"one-var": "off", // Requires grouping variables to one let/const, why ?
+		"curly": "off", // Requires brackets for every if
+		"no-param-reassign": "off", // Restrict reassign function args
+
+		"multiline-comment-style": "off",
+		"no-inline-comments": "off",
+		"line-comment-position": "off",
+		"capitalized-comments": "off",
+
+		"no-implicit-coercion": "off", // Always creating objects instead of primitives seems like an overhead
+		"no-undefined": "off", // Assigning value to undefined restricted by other rules, needed for comparison
+		"no-plusplus": "off", // WTF ?
+		"no-console": "off",
+		"no-ternary": "off", // WTF ?
+		"no-continue": "off", // WTF ?
+		"no-shadow": "off"
+	}
+}

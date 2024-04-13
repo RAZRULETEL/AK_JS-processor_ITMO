@@ -1,6 +1,6 @@
 import {Instruction, Opcode} from "./byte-code";
 
-const fs = require('fs');
+// import * as fs from "fs";
 
 enum Syntax {
     IF = "if",
@@ -11,7 +11,7 @@ enum Syntax {
     PRINT = "print",
 }
 
-const ComparisonOperator = {
+const ComparisonOperator: { [key: string]: Opcode } = {
     "=": Opcode.EQ,
     "!=": Opcode.NEQ,
     "<": Opcode.LT,
@@ -20,7 +20,7 @@ const ComparisonOperator = {
     ">=": Opcode.GE
 }
 
-const MathOperators = {
+const MathOperators: { [key: string]: Opcode } = {
     "+": Opcode.ADD,
     "-": Opcode.SUB,
     "*": Opcode.MUL,
@@ -33,7 +33,7 @@ const MathOperators = {
  * Have functional visibility - new function => new environment
  */
 interface LexicalEnvironment {
-    parent: LexicalEnvironment | null;
+    parent?: LexicalEnvironment;
     variables: string[];
 }
 
@@ -61,14 +61,14 @@ function translate(input_data: string): Instruction[] {
     const result: Instruction[] = [];
 
     const root: LexicalEnvironment = {
-        parent: null,
+        parent: undefined,
         variables: ["x"]
     };
 
     try {
         input_data = cut_expression(input_data.trim(), false);
-    } catch (e) {
-        throw new Error("Invalid input file.\n" + e);
+    } catch (err) {
+        throw new Error(`Invalid input file.\n${(err as Error).message}`);
     }
 
     if (input_data.startsWith("(")) {
@@ -80,13 +80,13 @@ function translate(input_data: string): Instruction[] {
     } else
         result.push(...parse(input_data, root));
 
-    return result.concat(functions.flatMap(e => e));
+    return result.concat(functions.flatMap(elem => elem));
 }
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     console.log("Parse ", !!lexical_environment.parent, input_data);
     if (!input_data.trim()) return [];
-    const match = input_data.substring(1).match(/^\s*\w+/);
+    const match = input_data.substring(1).match(/^\s*\w+/u);
 
     const expression = cut_expression(input_data);
 
@@ -99,7 +99,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.WHILE:
                 break;
             case Syntax.FUNCTION:
-                if (lexical_environment.parent != null)
+                if (lexical_environment.parent)
                     throw new Error("Nested functions not supported!");
                 function_definition(expression, lexical_environment);
                 break;
@@ -113,10 +113,10 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.PRINT:
                 break;
             default:
-                if (match && mappings[match[0]] != undefined) {
+                if (match && mappings[match[0]] !== undefined) {
                     result.push({
                         line: 0,
-                        source: "call " + match[0],
+                        source: `call ${  match[0]}`,
                         opcode: Opcode.CALL,
                         arg: {type: 'function', name: match[0]}
                     })
@@ -131,36 +131,37 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
 
 function cut_expression(input_data: string, save_brackets: boolean = true): string {
     let lvl = 0;
-    let i = 0;
+    let index: number = 0;
     let is_string = false;
     do {
-        let match;
-        if (!is_string && (match = input_data.substring(i).match(/^\s+/))) {
-            const is_bracket_close = input_data[i - 1] == "(" || input_data[i + match[0].length] == ")";
-            input_data = input_data.substring(0, i) + input_data.substring(i + match[0].length + is_bracket_close - 1, input_data.length);
-            (!is_bracket_close) && i++;
+        let match: RegExpMatchArray | null = null;
+        if (!is_string && (match = input_data.substring(index).match(/^\s+/u))) {
+            const is_bracket_close = input_data[index - 1] === "(" || input_data[index + match[0].length] === ")";
+            input_data = input_data.substring(0, index) + input_data.substring(index + match[0].length + +is_bracket_close - 1, input_data.length);
+            if(!is_bracket_close)
+                index++;
             continue;
         }
-        if (input_data[i] == '"' || input_data[i] == "'")
+        if (input_data[index] === '"' || input_data[index] === "'")
             is_string = !is_string;
 
-        if (!is_string && input_data[i] == "(")
+        if (!is_string && input_data[index] === "(")
             lvl++;
 
-        if (!is_string && input_data[i] == ")")
+        if (!is_string && input_data[index] === ")")
             lvl--;
 
-        i++;
+        index++;
 
-        if (i > input_data.length)
-            throw new Error("Expression not closed: " + input_data);
+        if (index > input_data.length)
+            throw new Error(`Expression not closed: ${  input_data}`);
     } while (lvl > 0)
-    return input_data.substring(save_brackets ? 0 : 1, i - +!save_brackets);
+    return input_data.substring(save_brackets ? 0 : 1, index - +!save_brackets);
 }
 
 function expression_to_parts(input_data: string): { action: string, first: string, second: string, third?: string } {
     if (!input_data.startsWith("("))
-        throw new Error("Expression must starts with '(': " + input_data);
+        throw new Error(`Expression must starts with '(': ${  input_data}`);
     input_data = cut_expression(input_data, false);
     const action = input_data.split(" ", 1)[0];
 
@@ -168,13 +169,13 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     if (first_expression.startsWith("("))
         first_expression = cut_expression(first_expression);
     else
-        first_expression = input_data.split(" ", 2)[1];
+        first_expression = input_data.split(" ")[1];
 
     let second_expression = input_data.substring(action.length + 1 + first_expression.length + 1);
     if (second_expression.startsWith("("))
         second_expression = cut_expression(second_expression);
 
-    let third_expression = input_data.substring(action.length + 1 + first_expression.length + 1 + second_expression.length).trim();
+    let third_expression: string | undefined = input_data.substring(action.length + 1 + first_expression.length + 1 + second_expression.length).trim();
     if (third_expression) {
         if (third_expression.startsWith("("))
             third_expression = cut_expression(third_expression);
@@ -182,22 +183,22 @@ function expression_to_parts(input_data: string): { action: string, first: strin
         third_expression = undefined;
 
 
-    return {action: action, first: first_expression, second: second_expression, third: third_expression};
+    return {action, first: first_expression, second: second_expression, third: third_expression};
 }
 
 function function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
-    const environment = {
+    const environment: LexicalEnvironment = {
         parent: lexical_environment,
         variables: []
     };
 
     let offset = 1 + Syntax.FUNCTION.length + 1
-    const name = input_data.substring(offset).match(/^\w+/)[0];
+    const name = input_data.substring(offset).match(/^\w+/u)[0];
     offset += name.length;
 
-    let args: string = input_data.substring(offset).match(/^\s*(\w+|\([^)]+\))\s*/)[0];
+    let args: string = input_data.substring(offset).match(/^\s*(\w+|\([^)]+\))\s*/u)[0];
     offset += args.length;
-    console.log("Define", name + '|' + args + '|' + input_data.substring(offset));
+    console.log("Define", `${name}|${args}|${input_data.substring(offset)}`);
     args = args.trim();
     if (args.startsWith("(")) {
         environment.variables.push(...args.substring(1, args.length - 1).split(" "));
@@ -210,17 +211,17 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     const body: Instruction[] = [];
     if (input_data.substring(offset).startsWith("((")) {
         body.push(...parse(input_data.substring(offset + 1), environment));
-        let i = 1 + body[body.length - 1].source.length;
-        while (input_data[i] != ")") {
+        // let i = 1 + body[body.length - 1].source.length;
+        // while (input_data[i] != ")") {
             body.push(...parse(input_data.substring(offset), environment));
             throw new Error("Not implemented!"); // TODO
-        }
+        // }
     } else {
         body.push(...parse(input_data.substring(offset), environment));
     }
     body.push({
         line: 0,
-        source: "ret " + name,
+        source: `ret ${  name}`,
         opcode: Opcode.RET,
         arg: 0
     });
@@ -232,9 +233,9 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
 
 
 function parse_math(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
-    let {action, first, second} = expression_to_parts(input_data);
+    const {action, first, second} = expression_to_parts(input_data);
 
-    if (MathOperators[action] == undefined) return [];
+    if (MathOperators[action] === undefined) return [];
 
     const result: Instruction[] = [];
 
@@ -272,16 +273,20 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
  */
 function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
-    const condition = input_data[4] != "(" ? input_data.substring(4).match(/^\w+/)[0] : cut_expression(input_data.substring(4));
 
-    let jmp: Instruction;
+    const condition = input_data[4] !== "(" ? input_data.substring(4).match(/^\w+/u)[0] : cut_expression(input_data.substring(4));
+    const {action, first, second, third} = expression_to_parts(input_data);
+
+    console.log(action, first, second, third);
+
+    let jmp: Instruction | null = null;
 
     if (condition.startsWith("(")) { // condition is an expression
         const args = condition.substring(1, condition.length - 1).split(" ");
-        if (args.length != 3)
-            throw new Error("Invalid arguments count: " + args.length + ", expected 3.");
-        if (ComparisonOperator[args[0]] == undefined)
-            throw new Error("Invalid comparison operator: " + args[0]);
+        if (args.length !== 3)
+            throw new Error(`Invalid arguments count: ${args.length}, expected 3.`);
+        if (ComparisonOperator[args[0]] === undefined)
+            throw new Error(`Invalid comparison operator: ${args[0]}`);
         result.push(load_value(args[1], lexical_environment));
         result.push(load_value(args[2], lexical_environment, true));
         jmp = {
@@ -290,15 +295,15 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
             opcode: ComparisonOperator[args[0]],
             arg: 0
         }
-    } else { // condition is a variable or constant
-        if (condition == "false") {
+    } else // condition is a variable or constant
+        if (condition === "false") {
             jmp = {
                 line: 0,
                 source: "",
                 opcode: Opcode.JMP,
                 arg: 0
             }
-        } else if (condition == "true") {
+        } else if (condition === "true") {
             jmp = null;
         } else {
             result.push(load_value(condition, lexical_environment));
@@ -309,8 +314,9 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
                 arg: 0
             }
         }
-    }
-    jmp && result.push(jmp);
+
+    if(jmp)
+        result.push(jmp);
 
     const positive = cut_expression(input_data.substring(5 + condition.length));
     const positive_branch = parse_code_branch(positive);
@@ -323,7 +329,8 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
         arg: 0
     };
     result.push(positive_end_jmp);
-    jmp && (jmp.arg = {addressing: "relative", value: positive_branch.length + 1});
+    if(jmp)
+        jmp.arg = {addressing: "relative", value: positive_branch.length + 1};
 
     const negative = cut_expression(input_data.substring(6 + condition.length + positive.length));
     const negative_branch = parse_code_branch(negative);
@@ -359,26 +366,26 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
 
 function load_value(variable: string, lexical_environment: LexicalEnvironment, compare_only: boolean = false): Instruction {
     if (isNaN(+variable))
-        if (lexical_environment.variables.indexOf(variable) == -1)
-            throw new Error("Variable " + variable + " is not defined.");
-        else if (lexical_environment.parent == null)
+        if (!lexical_environment.variables.includes(variable))
+            throw new Error(`Variable ${variable} is not defined.`);
+        else if (!lexical_environment.parent)
             return {
                 line: 0,
-                source: "load " + variable,
+                source: `load ${variable}`,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
                 arg: {type: 'variable', name: variable}
             }
         else
             return {
                 line: 0,
-                source: "load " + variable,
+                source: `load ${variable}`,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
                 arg: {type: 'stack', name: variable}
             }
     else
         return {
             line: 0,
-            source: "load direct " + variable,
+            source: `load direct ${variable}`,
             opcode: compare_only ? Opcode.CMP : Opcode.LD,
             arg: +variable
         }

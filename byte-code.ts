@@ -1,9 +1,4 @@
-
-
-interface MemoryCell {
-    value: Instruction | Data;
-    address: number;
-}
+/* eslint-disable no-magic-numbers */
 
 export interface Address{
     addressing: 'stack' | 'relative';
@@ -13,17 +8,6 @@ export interface Address{
 export interface TargetAddress{
     type: 'variable' | 'function' | 'stack';
     name: string;
-}
-
-export interface Instruction {
-    line: number;
-    source: string;
-    opcode: Opcode;
-    arg: TargetAddress | Address | Register | number;
-}
-
-interface Data {
-    value: number;
 }
 
 export enum Register {
@@ -60,4 +44,20 @@ export enum Opcode {
     CMP = 21,
     HALT = 22,
     LD = 23,
+}
+
+export interface Instruction {
+    line: number;
+    source: string;
+    opcode: Opcode;
+    arg: TargetAddress | Address | Register | number;
+}
+
+interface Data {
+    value: number;
+}
+
+interface MemoryCell {
+    value: Instruction | Data;
+    address: number;
 }
