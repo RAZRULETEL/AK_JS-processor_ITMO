@@ -8,14 +8,15 @@
 		"eslint:all",
 		"plugin:@typescript-eslint/strict-type-checked"
 	],
-	"parserOptions": {
-		"project": ["tsconfig.json"]
-	},
 	"ignorePatterns": [
 		"*.md",
 		"*.map"
 	],
 	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": ["tsconfig.json"]
+	},
+	"plugins": ["@typescript-eslint"],
 	"rules": {
 		"no-magic-numbers": ["error", {"ignore":  [0, 1]}],
 		"max-statements": ["error", 15, { "ignoreTopLevelFunctions": true }],
