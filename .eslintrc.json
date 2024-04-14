@@ -59,6 +59,8 @@
 		"no-console": "off",
 		"no-ternary": "off", // WTF ?
 		"no-continue": "off", // WTF ?
-		"no-shadow": "off"
+		"no-shadow": "off",
+
+		"max-lines": "off"
 	}
 }

@@ -2,6 +2,8 @@ import {Instruction, Opcode} from "./byte-code";
 
 // import * as fs from "fs";
 
+const IF_ARGS_COUNT = 3;
+
 enum Syntax {
     IF = "if",
     WHILE = "while",
@@ -154,7 +156,7 @@ function cut_expression(input_data: string, save_brackets: boolean = true): stri
         index++;
 
         if (index > input_data.length)
-            throw new Error(`Expression not closed: ${  input_data}`);
+            throw new Error(`Expression not closed: ${input_data}`);
     } while (lvl > 0)
     return input_data.substring(save_brackets ? 0 : 1, index - +!save_brackets);
 }
@@ -174,6 +176,8 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     let second_expression = input_data.substring(action.length + 1 + first_expression.length + 1);
     if (second_expression.startsWith("("))
         second_expression = cut_expression(second_expression);
+    else
+        second_expression = second_expression.split(" ")[0];
 
     let third_expression: string | undefined = input_data.substring(action.length + 1 + first_expression.length + 1 + second_expression.length).trim();
     if (third_expression) {
@@ -221,7 +225,7 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     }
     body.push({
         line: 0,
-        source: `ret ${  name}`,
+        source: `ret ${name}`,
         opcode: Opcode.RET,
         arg: 0
     });
@@ -266,6 +270,7 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
     return result;
 }
 
+
 /**
  * Parses 'if' expressions of next template 'if (> x y) (expression) (expression)' or 'if x (expression) (expression)'
  * @param input_data
@@ -274,20 +279,21 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
 function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
 
-    const condition = input_data[4] !== "(" ? input_data.substring(4).match(/^\w+/u)[0] : cut_expression(input_data.substring(4));
-    const {action, first, second, third} = expression_to_parts(input_data);
+    const {first, second, third} = expression_to_parts(input_data);
+    const condition = first;
 
-    console.log(action, first, second, third);
+    if(!third)
+        throw new Error("If statement always requires else branch");
 
     let jmp: Instruction | null = null;
 
     if (condition.startsWith("(")) { // condition is an expression
         const args = condition.substring(1, condition.length - 1).split(" ");
-        if (args.length !== 3)
+        if (args.length !== IF_ARGS_COUNT)
             throw new Error(`Invalid arguments count: ${args.length}, expected 3.`);
         if (ComparisonOperator[args[0]] === undefined)
             throw new Error(`Invalid comparison operator: ${args[0]}`);
-        result.push(load_value(args[1], lexical_environment));
+        result.push(load_value(args[1], lexical_environment)); // eslint-disable-next-line no-magic-numbers
         result.push(load_value(args[2], lexical_environment, true));
         jmp = {
             line: 0,
@@ -318,8 +324,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     if(jmp)
         result.push(jmp);
 
-    const positive = cut_expression(input_data.substring(5 + condition.length));
-    const positive_branch = parse_code_branch(positive);
+    const positive_branch = parse_code_branch(second);
     result.push(...positive_branch);
 
     const positive_end_jmp: Instruction = {
@@ -332,8 +337,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     if(jmp)
         jmp.arg = {addressing: "relative", value: positive_branch.length + 1};
 
-    const negative = cut_expression(input_data.substring(6 + condition.length + positive.length));
-    const negative_branch = parse_code_branch(negative);
+    const negative_branch = parse_code_branch(third);
     result.push(...negative_branch);
 
     positive_end_jmp.arg = {addressing: "relative", value: negative_branch.length};
