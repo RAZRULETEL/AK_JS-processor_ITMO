@@ -44,6 +44,7 @@ export enum Opcode {
     CMP = 21,
     HALT = 22,
     LD = 23,
+    ST = 24
 }
 
 export interface Instruction {
@@ -57,6 +58,7 @@ interface Data {
     value: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface MemoryCell {
     value: Instruction | Data;
     address: number;

@@ -101,7 +101,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.FUNCTION:
                 if (lexical_environment.parent)
                     throw new Error("Nested functions not supported!");
-                function_definition(expression, lexical_environment);
+                parse_function_definition(expression, lexical_environment);
                 break;
             case Syntax.RETURN:
                 break;
@@ -114,6 +114,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 break;
             default:
                 if (match && mappings[match[0]] !== undefined) {
+
                     result.push({
                         line: 0,
                         source: `call ${  match[0]}`,
@@ -192,7 +193,8 @@ function expression_to_parts(input_data: string): { action: string, first: strin
 }
 
 
-function function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
+// eslint-disable-next-line max-lines-per-function,max-statements
+function parse_function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
     const environment: LexicalEnvironment = {
         parent: lexical_environment,
         variables: []
@@ -203,12 +205,12 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     offset += name.length;
 
     let args = match_or_throw(input_data.substring(offset), /^\s*(\w+|\([^)]*\))\s*/u,
-        "Function must have arguments expression!");
+        "Function must have arguments expression in format '(a b c)' or 'a'!");
     offset += args.length;
     console.log("Define", `${name}|${args}|${input_data.substring(offset)}`);
     args = args.trim();
     if (args.startsWith("("))
-        environment.variables.push(...args.substring(1, args.length - 1).split(" "));
+        environment.variables.push(...args.substring(1, args.length - 1).split(" ").filter(el => !!el));
     else
         environment.variables.push(args);
 
@@ -217,6 +219,15 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
 
     const body: Instruction[] = [];
     parse_body(input_data.substring(offset));
+    if(environment.variables.length > 0){
+        body.push(set_value(environment.variables[0], environment));
+        body.push(...environment.variables.map(variable => ({
+            line: 0,
+            source: `pop function args ${variable}`,
+            opcode: Opcode.POP,
+            arg: 0
+        })));
+    }
     body.push({
         line: 0,
         source: `ret ${name}`,
@@ -229,6 +240,8 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     // console.log("Defined", name);
 
     function parse_body(input_body: string){
+        if(input_body.startsWith(")"))
+            throw new Error("Function must have body expression!");
         if (input_body.startsWith("((")) {
             body.push(...parse(input_body.substring(1), environment));
             // let i = 1 + body[body.length - 1].source.length;
@@ -380,19 +393,19 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
     if (isNaN(+variable))
         if (!lexical_environment.variables.includes(variable))
             throw new Error(`Variable ${variable} is not defined.`);
-        else if (!lexical_environment.parent)
+        else if (lexical_environment.parent)
             return {
                 line: 0,
                 source: `load ${variable}`,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
-                arg: {type: 'variable', name: variable}
+                arg: {type: 'stack', name: variable}
             }
         else
             return {
                 line: 0,
                 source: `load ${variable}`,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
-                arg: {type: 'stack', name: variable}
+                arg: {type: 'variable', name: variable}
             }
     else
         return {
@@ -402,6 +415,29 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
             arg: +variable
         }
 }
+
+function set_value(variable: string, lexical_environment: LexicalEnvironment): Instruction {
+    if (isNaN(+variable))
+        if (!lexical_environment.variables.includes(variable))
+            throw new Error(`Variable ${variable} is not defined.`);
+        else if (lexical_environment.parent)
+            return {
+                line: 0,
+                source: `set ${variable}`,
+                opcode: Opcode.ST,
+                arg: {type: 'stack', name: variable}
+            }
+        else
+            return {
+                line: 0,
+                source: `set ${variable}`,
+                opcode: Opcode.ST,
+                arg: {type: 'variable', name: variable}
+            }
+    else
+        throw new Error(`Variable must string: ${variable}`);
+}
+
 
 function match_or_throw(text: string, regexp: RegExp, message?: string){
     const match = text.match(regexp);
