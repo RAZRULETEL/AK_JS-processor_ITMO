@@ -54,9 +54,7 @@ const mappings: { [key: string]: number } = {}; // functions address mapping
 const functions: Instruction[][] = [];
 
 console.log(translate("((                  function                  factorial (x     h     k)" +
-    "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)))"), mappings);
-
-// console.log(expression_to_parts("(>=  (                 print           a              )     (                 print           a              )  (                 print           a              )  )"));
+    "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)) (function ter()()))"), mappings);
 
 // Translate the input file.
 function translate(input_data: string): Instruction[] {
@@ -125,12 +123,13 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 }
                 break;
         }
-    else {
-        result.push(...parse_math(input_data, lexical_environment));
-    }
+    else if(cut_expression(input_data, false))
+            result.push(...parse_math(input_data, lexical_environment));
+
     return result;
 }
 
+// eslint-disable-next-line max-statements
 function cut_expression(input_data: string, save_brackets: boolean = true): string {
     let lvl = 0;
     let index: number = 0;
@@ -165,6 +164,8 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     if (!input_data.startsWith("("))
         throw new Error(`Expression must starts with '(': ${  input_data}`);
     input_data = cut_expression(input_data, false);
+    if(!input_data)
+        throw new Error("Expression cannot be empty!");
     const action = input_data.split(" ", 1)[0];
 
     let first_expression = input_data.substring(action.length + 1);
@@ -190,6 +191,7 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     return {action, first: first_expression, second: second_expression, third: third_expression};
 }
 
+
 function function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
     const environment: LexicalEnvironment = {
         parent: lexical_environment,
@@ -197,32 +199,24 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
     };
 
     let offset = 1 + Syntax.FUNCTION.length + 1
-    const name = input_data.substring(offset).match(/^\w+/u)[0];
+    const name = match_or_throw(input_data.substring(offset), /^\w+/u, "Function must have name!")
     offset += name.length;
 
-    let args: string = input_data.substring(offset).match(/^\s*(\w+|\([^)]+\))\s*/u)[0];
+    let args = match_or_throw(input_data.substring(offset), /^\s*(\w+|\([^)]*\))\s*/u,
+        "Function must have arguments expression!");
     offset += args.length;
     console.log("Define", `${name}|${args}|${input_data.substring(offset)}`);
     args = args.trim();
-    if (args.startsWith("(")) {
+    if (args.startsWith("("))
         environment.variables.push(...args.substring(1, args.length - 1).split(" "));
-    } else {
+    else
         environment.variables.push(args);
-    }
+
 
     mappings[name] = functions.length;
 
     const body: Instruction[] = [];
-    if (input_data.substring(offset).startsWith("((")) {
-        body.push(...parse(input_data.substring(offset + 1), environment));
-        // let i = 1 + body[body.length - 1].source.length;
-        // while (input_data[i] != ")") {
-            body.push(...parse(input_data.substring(offset), environment));
-            throw new Error("Not implemented!"); // TODO
-        // }
-    } else {
-        body.push(...parse(input_data.substring(offset), environment));
-    }
+    parse_body(input_data.substring(offset));
     body.push({
         line: 0,
         source: `ret ${name}`,
@@ -232,7 +226,20 @@ function function_definition(input_data: string, lexical_environment: LexicalEnv
 
     functions.push(body);
 
-    console.log("Defined", name);
+    // console.log("Defined", name);
+
+    function parse_body(input_body: string){
+        if (input_body.startsWith("((")) {
+            body.push(...parse(input_body.substring(1), environment));
+            // let i = 1 + body[body.length - 1].source.length;
+            // while (input_data[i] != ")") {
+            body.push(...parse(input_body, environment));
+            throw new Error("Not implemented!"); // TODO
+            // }
+        } else {
+            body.push(...parse(input_body, environment));
+        }
+    }
 }
 
 
@@ -276,6 +283,7 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
  * @param input_data
  * @param lexical_environment
  */
+// eslint-disable-next-line max-lines-per-function,max-statements
 function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
 
@@ -393,4 +401,11 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
             opcode: compare_only ? Opcode.CMP : Opcode.LD,
             arg: +variable
         }
+}
+
+function match_or_throw(text: string, regexp: RegExp, message?: string){
+    const match = text.match(regexp);
+    if(match)
+        return match[0];
+    throw new Error(message);
 }
