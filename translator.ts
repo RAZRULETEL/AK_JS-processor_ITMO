@@ -39,6 +39,12 @@ interface LexicalEnvironment {
     variables: string[];
 }
 
+interface FunctionContainer {
+    address: number
+    name: string;
+    body: Instruction[];
+}
+
 // Accept two arguments: input file and output file.
 // if(process.argv.length != 4) {
 //     console.log("Usage: node " + process.argv[1] +" <input file> <output file>");
@@ -50,8 +56,7 @@ interface LexicalEnvironment {
 // Read the input file.
 // const input_data = fs.readFileSync(input_file, 'utf8');
 
-const mappings: { [key: string]: number } = {}; // functions address mapping
-const functions: Instruction[][] = [];
+const mappings: { [key: string]: FunctionContainer } = {}; // functions address mapping
 
 console.log(translate("((    function    factorial (x     h     k)" +
     "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)) (function ter()()))"), mappings);
@@ -80,7 +85,7 @@ function translate(input_data: string): Instruction[] {
     } else
         result.push(...parse(input_data, root));
 
-    return result.concat(functions.flatMap(elem => elem));
+    return result;
 }
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
@@ -208,14 +213,18 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
     else
         environment.variables.push(args);
 
-
-    mappings[name] = functions.length;
-
     const body: Instruction[] = [];
+
+    mappings[name] = {
+        address: Object.keys(mappings).length,
+        name,
+        body
+    };
+
     parse_body(input_data.substring(offset));
     if(environment.variables.length > 0){
         body.push(set_value(environment.variables[0], environment));
-        body.push(...environment.variables.map(variable => ({
+        body.push(...environment.variables.reverse().map(variable => ({
             line: 0,
             source: `pop function args ${variable}`,
             opcode: Opcode.POP,
@@ -228,8 +237,6 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         opcode: Opcode.RET,
         arg: 0
     });
-
-    functions.push(body);
 
     // console.log("Defined", name);
 
