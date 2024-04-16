@@ -53,7 +53,7 @@ interface LexicalEnvironment {
 const mappings: { [key: string]: number } = {}; // functions address mapping
 const functions: Instruction[][] = [];
 
-console.log(translate("((                  function                  factorial (x     h     k)" +
+console.log(translate("((    function    factorial (x     h     k)" +
     "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)) (function ter()()))"), mappings);
 
 // Translate the input file.
@@ -113,15 +113,8 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.PRINT:
                 break;
             default:
-                if (match && mappings[match[0]] !== undefined) {
-
-                    result.push({
-                        line: 0,
-                        source: `call ${  match[0]}`,
-                        opcode: Opcode.CALL,
-                        arg: {type: 'function', name: match[0]}
-                    })
-                }
+                if (match && mappings[match[0]] !== undefined)
+                    result.push(...parse_call_function(match[0], cut_expression(input_data.substring(1 + match[0].length)).trim(), lexical_environment));
                 break;
         }
     else if(cut_expression(input_data, false))
@@ -135,6 +128,7 @@ function cut_expression(input_data: string, save_brackets: boolean = true): stri
     let lvl = 0;
     let index: number = 0;
     let is_string = false;
+    while (input_data[index] === ' ') index++;
     do {
         let match: RegExpMatchArray | null = null;
         if (!is_string && (match = input_data.substring(index).match(/^\s+/u))) {
@@ -256,6 +250,51 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
 }
 
 
+function parse_call_function(name: string, args: string, lexical_environment: LexicalEnvironment): Instruction[]{
+    const result: Instruction[] = []
+
+    console.log(`Call ${name} with args '${args}'`);
+    if(!args.startsWith("("))
+        throw new Error("Function call must have args expression!");
+
+    if(args.startsWith("("))
+        args = args.substring(1, args.length - 1);
+    else
+        throw new Error("Function call must have args expression!");
+
+    if(MathOperators[args[0]]) {
+        result.push(...parse_math(`(${args})`, lexical_environment));
+        result.push({
+            line: 0,
+            source: `push (${args})`,
+            opcode: Opcode.PUSH,
+            arg: 0
+        })
+        return result
+    }
+
+    const variables = args.matchAll(/(\w+|\([^() ]+\))/igu);
+    for(const variable of variables){
+        console.log(variable);
+        result.push(load_value(variable[0], lexical_environment));
+        result.push({
+            line: 0,
+            source: `push ${variable[0]}`,
+            opcode: Opcode.PUSH,
+            arg: 0
+        })
+    }
+
+    result.push({
+        line: 0,
+        source: `call ${name}`,
+        opcode: Opcode.CALL,
+        arg: {type: 'function', name}
+    })
+
+    return result;
+}
+
 function parse_math(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const {action, first, second} = expression_to_parts(input_data);
 
@@ -270,7 +309,7 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
 
     result.push({
         line: 0,
-        source: "",
+        source: `first math arg save ${first}`,
         opcode: Opcode.PUSH,
         arg: 0
     });
@@ -282,7 +321,7 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
 
     result.push({
         line: 0,
-        source: "",
+        source: `first math arg load ${input_data}`,
         opcode: Opcode.POP,
         arg: 0
     });
@@ -378,9 +417,11 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
                 result.push(...parse(expression, lexical_environment));
                 input = input.substring(expression.length);
             }
-        } else {// Single expression
-            result.push(...parse(`(${input})`, lexical_environment));
-        }
+        } else // Single expression
+            if(input.match(/^(\w|\d)+$/ui))
+                result.push(load_value(input, lexical_environment));
+            else
+                result.push(...parse(`(${input})`, lexical_environment));
 
         // console.log("RES", result);
 
