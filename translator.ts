@@ -58,7 +58,7 @@ interface FunctionContainer {
 
 const mappings: { [key: string]: FunctionContainer } = {}; // functions address mapping
 
-console.log(translate("((    function    factorial (x     h     k)" +
+console.log(translate("((setq x 6)(    function    factorial (x     h     k)" +
     "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)) (function ter()()))"), mappings);
 
 // Translate the input file.
@@ -111,9 +111,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.RETURN:
                 break;
             case Syntax.SET:
-
-                if (lexical_environment.variables.indexOf("") > 0)
-                    lexical_environment.variables.push();
+                result.push(...parse_setq(input_data, lexical_environment));
                 break;
             case Syntax.PRINT:
                 break;
@@ -492,4 +490,24 @@ function match_or_throw(text: string, regexp: RegExp, message?: string){
     if(match)
         return match[0];
     throw new Error(message);
+}
+
+
+function parse_setq(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    const result: Instruction[] = [];
+
+    const {first, second} = expression_to_parts(input);
+    if(!first.match(/^\w(\w|\d)*$/ui))
+        throw new Error(`Invalid variable name: ${first}`);
+
+    if(second.startsWith("("))
+        result.push(...parse(second, lexical_environment));
+    else
+        result.push(load_value(second, lexical_environment));
+
+    if(!lexical_environment.variables.includes(first))
+        lexical_environment.variables.push(first)
+
+    result.push(set_value(first, lexical_environment));
+    return result;
 }
