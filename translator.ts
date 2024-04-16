@@ -66,6 +66,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 result.push(...parse_if(expression, lexical_environment));
                 break;
             case Syntax.WHILE:
+                result.push(...parse_while(input_data, lexical_environment));
                 break;
             case Syntax.FUNCTION:
                 if (lexical_environment.parent)
@@ -479,4 +480,38 @@ function parse_setq(input: string, lexical_environment: LexicalEnvironment): Ins
 
     result.push(set_value(first, lexical_environment));
     return result;
+}
+
+function parse_while(input: string, lexical_environment: LexicalEnvironment): Instruction[]{
+    const result: Instruction[] = [];
+
+    console.log(expression_to_parts(input));
+
+    const {first, second} = expression_to_parts(input);
+    const [condition, jmp] = parse_logical_expression(first, lexical_environment);
+
+    result.push(...condition);
+
+    const body: Instruction[] = [];
+    if(second.startsWith("((")){
+        let body_expressions = second.substring(1, second.length - 1);
+        while (body_expressions) {
+            const expression = cut_expression(body_expressions);
+            body.push(...parse(expression, lexical_environment));
+            body_expressions = body_expressions.substring(expression.length);
+        }
+    }else
+        body.push(...parse(second, lexical_environment));
+
+    if(jmp)
+        condition[jmp].arg = {addressing: "relative", value: body.length + 1};
+
+    result.push(...body, {
+        line: 0,
+        source: "while jmp",
+        opcode: Opcode.JMP,
+        arg: {addressing: "relative", value: -body.length - 1 - condition.length}
+    });
+
+    return result
 }
