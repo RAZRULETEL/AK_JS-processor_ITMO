@@ -1,0 +1,6 @@
+((setq x 6)
+ (    function    factorial (x     h     k)
+                    (if                 (>=   x     0) 1          (* x (factorial (- x 1)))))
+ (function test(a b c)(print a))
+ (function ter()())
+)

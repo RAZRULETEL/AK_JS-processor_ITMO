@@ -1,63 +1,29 @@
+import * as fs from "fs";
+import {ComparisonOperator, FunctionContainer, LexicalEnvironment, MathOperators, Syntax} from "./translator-types";
 import {Instruction, Opcode} from "./byte-code";
 
-// import * as fs from "fs";
-
-enum Syntax {
-    IF = "if",
-    WHILE = "while",
-    FUNCTION = "function",
-    RETURN = "return",
-    SET = "setq",
-    PRINT = "print",
-}
-
-const ComparisonOperator: { [key: string]: Opcode } = {
-    "=": Opcode.EQ,
-    "!=": Opcode.NEQ,
-    "<": Opcode.LT,
-    ">": Opcode.GT,
-    "<=": Opcode.LE,
-    ">=": Opcode.GE
-}
-
-const MathOperators: { [key: string]: Opcode } = {
-    "+": Opcode.ADD,
-    "-": Opcode.SUB,
-    "*": Opcode.MUL,
-    "/": Opcode.DIV,
-    "%": Opcode.DIV,
-}
-
-/**
- * Environment that contains accessible variables and parent environment
- * Have functional visibility - new function => new environment
- */
-interface LexicalEnvironment {
-    parent?: LexicalEnvironment;
-    variables: string[];
-}
-
-interface FunctionContainer {
-    address: number
-    name: string;
-    body: Instruction[];
-}
+const CLI_ARGS_COUNT = 4;
+const INPUT_FILE_ARG_INDEX = 2;
+const OUTPUT_FILE_ARG_INDEX = 3;
 
 // Accept two arguments: input file and output file.
-// if(process.argv.length != 4) {
-//     console.log("Usage: node " + process.argv[1] +" <input file> <output file>");
-//     process.exit(1);
-// }
-// const input_file = process.argv[2];
-// const output_file = process.argv[3];
+if(process.argv.length !== CLI_ARGS_COUNT) {
+    console.log(`Usage: node ${ process.argv[1] } <input file> <output file>`);
+    process.exit(1);
+}
+const input_file = process.argv[INPUT_FILE_ARG_INDEX];
+const output_file = process.argv[OUTPUT_FILE_ARG_INDEX];
 
 // Read the input file.
-// const input_data = fs.readFileSync(input_file, 'utf8');
+const input_data = fs.readFileSync(input_file, 'utf8');
 
 const mappings: { [key: string]: FunctionContainer } = {}; // functions address mapping
 
-console.log(translate("((setq x 6)(    function    factorial (x     h     k)" +
-    "          (if                 (>=   x     0) 1          (* x (factorial (- x 1))))) (function test(a b c)(print a)) (function ter()()))"), mappings);
+const program = translate(input_data);
+console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
+
+fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join("\n"), 'utf8');
+
 
 // Translate the input file.
 function translate(input_data: string): Instruction[] {
