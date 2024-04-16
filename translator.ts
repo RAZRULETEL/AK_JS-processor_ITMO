@@ -2,8 +2,6 @@ import {Instruction, Opcode} from "./byte-code";
 
 // import * as fs from "fs";
 
-const IF_ARGS_COUNT = 3;
-
 enum Syntax {
     IF = "if",
     WHILE = "while",
@@ -67,7 +65,7 @@ function translate(input_data: string): Instruction[] {
 
     const root: LexicalEnvironment = {
         parent: undefined,
-        variables: ["x"]
+        variables: []
     };
 
     try {
@@ -107,8 +105,6 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 if (lexical_environment.parent)
                     throw new Error("Nested functions not supported!");
                 parse_function_definition(expression, lexical_environment);
-                break;
-            case Syntax.RETURN:
                 break;
             case Syntax.SET:
                 result.push(...parse_setq(input_data, lexical_environment));
@@ -334,6 +330,50 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
     return result;
 }
 
+function parse_logical_expression(input: string, lexical_environment: LexicalEnvironment): [Instruction[], number | null] {
+    const result: Instruction[] = [];
+
+    const {action, first, second, third} = expression_to_parts(input);
+
+    if(third !== undefined)
+        throw new Error(`Too many arguments in logical expression, expected 3: ${input}`);
+
+    let jmp: Instruction | null = null;
+    if(ComparisonOperator[action] === undefined)
+        throw new Error(`Invalid logical operator, expected one of [${Object.keys(ComparisonOperator).join(", ")}]: ${action}`);
+
+    if (input.startsWith("(")) { // condition is an expression // TODO: add support for multiple expressions
+        result.push(load_value(first, lexical_environment)); // eslint-disable-next-line no-magic-numbers
+        result.push(load_value(second, lexical_environment, true));
+        jmp = {
+            line: 0,
+            source: "if jmp",
+            opcode: ComparisonOperator[action],
+            arg: 0
+        }
+    } else // condition is a variable or constant
+    if (input === "false") {
+        jmp = {
+            line: 0,
+            source: "",
+            opcode: Opcode.JMP,
+            arg: 0
+        }
+    } else if (input === "true") {
+        jmp = null;
+    } else {
+        result.push(load_value(input, lexical_environment));
+        jmp = {
+            line: 0,
+            source: "",
+            opcode: Opcode.JNZ,
+            arg: 0
+        }
+    }
+
+    return [result, jmp && result.push(jmp) - 1];
+}
+
 
 /**
  * Parses 'if' expressions of next template 'if (> x y) (expression) (expression)' or 'if x (expression) (expression)'
@@ -345,49 +385,12 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     const result: Instruction[] = [];
 
     const {first, second, third} = expression_to_parts(input_data);
-    const condition = first;
 
     if(!third)
         throw new Error("If statement always requires else branch");
 
-    let jmp: Instruction | null = null;
-
-    if (condition.startsWith("(")) { // condition is an expression
-        const args = condition.substring(1, condition.length - 1).split(" ");
-        if (args.length !== IF_ARGS_COUNT)
-            throw new Error(`Invalid arguments count: ${args.length}, expected 3.`);
-        if (ComparisonOperator[args[0]] === undefined)
-            throw new Error(`Invalid comparison operator: ${args[0]}`);
-        result.push(load_value(args[1], lexical_environment)); // eslint-disable-next-line no-magic-numbers
-        result.push(load_value(args[2], lexical_environment, true));
-        jmp = {
-            line: 0,
-            source: "if jmp",
-            opcode: ComparisonOperator[args[0]],
-            arg: 0
-        }
-    } else // condition is a variable or constant
-        if (condition === "false") {
-            jmp = {
-                line: 0,
-                source: "",
-                opcode: Opcode.JMP,
-                arg: 0
-            }
-        } else if (condition === "true") {
-            jmp = null;
-        } else {
-            result.push(load_value(condition, lexical_environment));
-            jmp = {
-                line: 0,
-                source: "",
-                opcode: Opcode.JNZ,
-                arg: 0
-            }
-        }
-
-    if(jmp)
-        result.push(jmp);
+    const [condition_code, jmp] = parse_logical_expression(first, lexical_environment);
+    result.push(...condition_code);
 
     const positive_branch = parse_code_branch(second);
     result.push(...positive_branch);
@@ -400,7 +403,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     };
     result.push(positive_end_jmp);
     if(jmp)
-        jmp.arg = {addressing: "relative", value: positive_branch.length + 1};
+        condition_code[jmp].arg = {addressing: "relative", value: positive_branch.length + 1};
 
     const negative_branch = parse_code_branch(third);
     result.push(...negative_branch);
