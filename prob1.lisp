@@ -1,0 +1,15 @@
+(
+    (setq sum 0)
+    (setq i 1)
+    (while (< i 1000)(
+        (if (= (% i 3) 0)
+            (setq sum (+ sum i))
+            (if (= (% i 5) 0)
+                (setq sum (+ sum i))
+                ()
+            )
+        )
+        (setq i (+ i 1))
+    ))
+    (print sum)
+)

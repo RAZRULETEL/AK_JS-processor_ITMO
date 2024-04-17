@@ -47,7 +47,8 @@ export enum Opcode {
     CMP = 21,
     HALT = 22,
     LD = 23,
-    ST = 24
+    ST = 24,
+    FLUSH = 25, // increment SP
 }
 
 export interface Instruction {
