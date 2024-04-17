@@ -266,12 +266,24 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
     return result;
 }
 
-function parse_math(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
-    const {action, first, second} = expression_to_parts(input_data);
+function parse_math(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    const {action, first, second} = expression_to_parts(input);
 
     if (MathOperators[action] === undefined) return [];
 
     const result: Instruction[] = [];
+
+    if (second.startsWith("("))
+        result.push(...parse(second, lexical_environment));
+    else
+        result.push(load_value(second, lexical_environment));
+
+    result.push({
+        line: 0,
+        source: `second math arg save ${second}`,
+        opcode: Opcode.PUSH,
+        arg: 0
+    });
 
     if (first.startsWith("("))
         result.push(...parse(first, lexical_environment));
@@ -280,26 +292,21 @@ function parse_math(input_data: string, lexical_environment: LexicalEnvironment)
 
     result.push({
         line: 0,
-        source: `first math arg save ${first}`,
-        opcode: Opcode.PUSH,
-        arg: 0
-    });
-
-    if (second.startsWith("("))
-        result.push(...parse(second, lexical_environment));
-    else
-        result.push(load_value(second.split(" ", 1)[0], lexical_environment));
-
-    result.push({
+        source: `second math arg load ${input}`,
+        opcode: MathOperators[action],
+        arg: {addressing: 'stack', value: 0}
+    },{
         line: 0,
-        source: `first math arg load ${input_data}`,
-        opcode: Opcode.POP,
+        source: `second math arg clear`,
+        opcode: Opcode.FLUSH,
         arg: 0
-    });
+    })
+
 
     return result;
 }
 
+// eslint-disable-next-line max-lines-per-function,max-statements
 function parse_logical_expression(input: string, lexical_environment: LexicalEnvironment): [Instruction[], number | null] {
     const result: Instruction[] = [];
 
@@ -313,8 +320,35 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
         throw new Error(`Invalid logical operator, expected one of [${Object.keys(ComparisonOperator).join(", ")}]: ${action}`);
 
     if (input.startsWith("(")) { // condition is an expression // TODO: add support for multiple expressions
-        result.push(load_value(first, lexical_environment)); // eslint-disable-next-line no-magic-numbers
-        result.push(load_value(second, lexical_environment, true));
+        if (second.startsWith("("))
+            result.push(...parse(second, lexical_environment));
+        else
+            result.push(load_value(second, lexical_environment, true));
+
+        result.push({
+            line: 0,
+            source: `second logic arg save ${second}`,
+            opcode: Opcode.PUSH,
+            arg: 0
+        });
+
+        if(first.startsWith("("))
+            result.push(...parse(first, lexical_environment));
+        else
+            result.push(load_value(first, lexical_environment)); // eslint-disable-next-line no-magic-numbers
+
+        result.push({
+            line: 0,
+            source: `second logic arg load ${input}`,
+            opcode: Opcode.CMP,
+            arg: {addressing: 'stack', value: 0}
+        },{
+            line: 0,
+            source: `second logic arg clear`,
+            opcode: Opcode.FLUSH,
+            arg: 0
+        })
+
         jmp = {
             line: 0,
             source: input,
