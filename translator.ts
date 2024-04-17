@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import {ComparisonOperator, FunctionContainer, LexicalEnvironment, MathOperators, Syntax} from "./translator-types";
-import {Instruction, Opcode} from "./byte-code";
+import {Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
 
 const CLI_ARGS_COUNT = 4;
 const INPUT_FILE_ARG_INDEX = 2;
@@ -21,6 +21,8 @@ const mappings: { [key: string]: FunctionContainer } = {}; // functions address 
 
 const program = translate(input_data);
 console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
+
+program.push(...Object.values(mappings).flatMap(el => el.body));
 
 fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join("\n"), 'utf8');
 
@@ -77,6 +79,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 result.push(...parse_setq(input_data, lexical_environment));
                 break;
             case Syntax.PRINT:
+                result.push(...parse_print(expression, lexical_environment));
                 break;
             default:
                 if (match && mappings[match[0]] !== undefined)
@@ -314,7 +317,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
         result.push(load_value(second, lexical_environment, true));
         jmp = {
             line: 0,
-            source: "if jmp",
+            source: input,
             opcode: ComparisonOperator[action],
             arg: 0
         }
@@ -322,7 +325,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
     if (input === "false") {
         jmp = {
             line: 0,
-            source: "",
+            source: input,
             opcode: Opcode.JMP,
             arg: 0
         }
@@ -332,7 +335,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
         result.push(load_value(input, lexical_environment));
         jmp = {
             line: 0,
-            source: "",
+            source: input,
             opcode: Opcode.JNZ,
             arg: 0
         }
@@ -487,7 +490,7 @@ function parse_while(input: string, lexical_environment: LexicalEnvironment): In
 
     console.log(expression_to_parts(input));
 
-    const {first, second} = expression_to_parts(input);
+    const {action, first, second} = expression_to_parts(input);
     const [condition, jmp] = parse_logical_expression(first, lexical_environment);
 
     result.push(...condition);
@@ -508,9 +511,30 @@ function parse_while(input: string, lexical_environment: LexicalEnvironment): In
 
     result.push(...body, {
         line: 0,
-        source: "while jmp",
+        source: `${action} ${first}`,
         opcode: Opcode.JMP,
         arg: {addressing: "relative", value: -body.length - 1 - condition.length}
+    });
+
+    return result
+}
+
+function parse_print(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    const result: Instruction[] = [];
+
+    const {first} = expression_to_parts(input);
+
+    if(first.startsWith("(")){
+        const expression = cut_expression(first);
+        result.push(...parse(expression, lexical_environment));
+    }else
+        result.push(load_value(first, lexical_environment));
+
+    result.push({
+        line: 0,
+        source: input,
+        opcode: Opcode.ST,
+        arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
     });
 
     return result

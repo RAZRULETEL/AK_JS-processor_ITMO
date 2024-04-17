@@ -1,7 +1,10 @@
 /* eslint-disable no-magic-numbers */
 
+export const OUTPUT_ADDRESS = 1;
+export const INPUT_ADDRESS = 2;
+
 export interface Address{
-    addressing: 'stack' | 'relative';
+    addressing: 'stack' | 'relative' | 'absolute';
     value: number;
 }
 
