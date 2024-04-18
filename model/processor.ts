@@ -1,4 +1,3 @@
-import {Address, Opcode, Register} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
@@ -7,6 +6,7 @@ import {
     ProcessorState,
     STACK_OPERANDS
 } from "./processor-types";
+import {Opcode, Register} from "../byte-code";
 import {AluOperation} from "./alu";
 import {MemoryStorage} from "./memory";
 
@@ -141,30 +141,11 @@ export class Processor {
             const instruction = this.registers.PR;
             if (instruction.opcode === Opcode.POP || typeof instruction.arg === 'object') {
 
-                let arg: Address = {addressing: 'absolute', value: 0};
-                if (instruction.opcode !== Opcode.POP)
-                    if (typeof instruction.arg === 'object')
-                        if('addressing' in instruction.arg)
-                            arg = instruction.arg;
-                        else
-                            throw new Error("Invalid instruction");
-
                 this.latch_buffer_register(this.alu_operation(Register.IP));
                 if(instruction.opcode === Opcode.POP){
                     this.latch_instruction_pointer(this.alu_operation(Register.SP, Register.ZR, Opcode.DEC));
                 }else
-                    switch(arg.addressing) {
-                        case "relative":
-                            this.latch_instruction_pointer(this.alu_operation(Register.IP, arg.value));
-                        break;
-                        case "stack":
-                            this.latch_instruction_pointer(this.alu_operation(Register.SP, arg.value - 1));
-                            break;
-                        case "absolute":
-                        default:
-                            this.latch_instruction_pointer(this.alu_operation(Register.ZR, arg.value));
-                            break;
-                    }
+                    this.latch_instruction_pointer(this.fetch_instruction_address());
 
                 this.latch_data_register();
                 this.latch_instruction_pointer(this.alu_operation(Register.BR));
@@ -184,6 +165,11 @@ export class Processor {
 
         const opcode = this.registers.PR.opcode;
 
+        if (opcode === Opcode.HALT) {
+            this.state = ProcessorState.Halted;
+            return;
+        }
+
         if(opcode !== Opcode.CMP && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
             this.latch_accumulator(this.alu_operation(Register.BR, Register.ACC, opcode)
                 , ![Opcode.LD, Opcode.POP].includes(opcode));
@@ -200,15 +186,7 @@ export class Processor {
             this.latch_buffer_register(this.alu_operation(Register.IP));
             this.latch_instruction_pointer(this.alu_operation(Register.SP));
             this.latch_memory(this.alu_operation(Register.BR));
-            if((typeof this.registers.PR.arg === 'object') && "addressing" in this.registers.PR.arg)
-                if(this.registers.PR.arg.addressing === "relative")
-                    this.latch_instruction_pointer(this.alu_operation(Register.BR, this.registers.PR.arg.value));
-                else if(this.registers.PR.arg.addressing === "absolute")
-                    this.latch_instruction_pointer(this.alu_operation(Register.ZR, this.registers.PR.arg.value));
-                else
-                    throw new Error(`Invalid addressing for call: ${this.registers.PR.arg.addressing}`);
-            else
-                throw new Error("Call instruction must have Address arg");
+            this.latch_instruction_pointer(this.fetch_instruction_address());
         }
 
         if(opcode === Opcode.RET){
@@ -221,5 +199,42 @@ export class Processor {
             this.latch_stack_pointer();
 
         this.state = ProcessorState.WritingData;
+    }
+
+    write_data(){
+        if(this.state !== ProcessorState.WritingData)
+            throw new Error(`Processor have incorrect state: ${this.state}`);
+        if(!this.registers.PR)
+            throw new Error("Processor have no instruction fetched");
+
+        if(this.registers.PR.opcode === Opcode.PUSH){
+            this.latch_buffer_register(this.alu_operation(Register.IP));
+            this.latch_instruction_pointer(this.alu_operation(Register.SP));
+            this.latch_memory(this.alu_operation(Register.ACC));
+            this.latch_instruction_pointer(this.alu_operation(Register.BR));
+        }
+
+        if(this.registers.PR.opcode === Opcode.ST){
+            this.latch_buffer_register(this.alu_operation(Register.IP));
+            this.latch_instruction_pointer(this.fetch_instruction_address());
+            this.latch_memory(this.alu_operation(Register.ACC));
+            this.latch_instruction_pointer(this.alu_operation(Register.BR));
+        }
+
+        this.state = ProcessorState.FetchingInstruction;
+    }
+
+    fetch_instruction_address(): AluOperation{
+        if(!this.registers.PR)
+            throw new Error("Processor have no instruction fetched");
+        if((typeof this.registers.PR.arg === 'object') && "addressing" in this.registers.PR.arg)
+            if(this.registers.PR.arg.addressing === "relative")
+                return this.alu_operation(Register.BR, this.registers.PR.arg.value);
+            else if(this.registers.PR.arg.addressing === "absolute")
+                return this.alu_operation(Register.ZR, this.registers.PR.arg.value);
+            else
+                return this.alu_operation(Register.SP, this.registers.PR.arg.value);
+        else
+            throw new Error("Call instruction must have Address arg");
     }
 }
