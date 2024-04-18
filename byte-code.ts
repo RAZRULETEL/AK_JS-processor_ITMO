@@ -14,12 +14,13 @@ export interface TargetAddress{
 }
 
 export enum Register {
-    ACC = 0, // accumulator
-    IP = 1, // instruction pointer
-    SP = 2, // stack pointer
-    BR = 3, // buffer register
-    DR = 4, // data register | read-write from memory
-    PR = 5, // program register
+    ACC = 'ACC', // accumulator
+    IP = 'IP', // instruction pointer
+    SP = 'SP', // stack pointer
+    BR = 'BR', // buffer register
+    DR = 'DR', // data register | read-write from memory
+    PR = 'PR', // program register,
+    ZR = 'ZR', // always zero
 }
 
 export enum Opcode {
@@ -62,8 +63,24 @@ export interface Data {
     value: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface MemoryCell {
-    value: Instruction | Data;
-    address: number;
-}
+// export function data_to_instruction(data: Data): Instruction {
+//     return {
+//         line: 0,
+//         source: 'data conversion',
+//         opcode: data.value & 0x1F,
+//         arg: data.value
+//     };
+// }
+//
+// export function instruction_to_data(instruction: Instruction): Data {
+//     let value = instruction.opcode;
+//     if(typeof instruction.arg === 'object') {
+//         const addressing = (instruction.arg as Address).addressing;
+//
+//         value += (instruction.arg as Address).value;
+//     }else
+//         value += instruction.arg;
+//     return {
+//         value
+//     };
+// }
