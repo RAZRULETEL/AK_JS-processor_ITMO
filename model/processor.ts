@@ -1,14 +1,16 @@
 import {Address, Opcode, Register} from "../byte-code";
-import {AluOperation} from "./alu";
-// eslint-disable-next-line sort-imports
 import {
     Flags,
     JMP_CHECK_CONDITION,
     OPERANDS_REQUIRES_DATA_FETCH,
     ProcessorRegisters,
-    ProcessorState
+    ProcessorState,
+    STACK_OPERANDS
 } from "./processor-types";
+import {AluOperation} from "./alu";
 import {MemoryStorage} from "./memory";
+
+export const REGISTER_BITS_SIZE = 32;
 
 
 export class Processor {
@@ -70,7 +72,7 @@ export class Processor {
                 else if (instruction.arg.addressing === "absolute")
                     this.registers.IP = instruction.arg.value;
                 else
-                    throw new Error(`Invalid addressing: ${instruction.arg.addressing}`);
+                    throw new Error(`Invalid addressing fot jmp: ${instruction.arg.addressing}`);
         }
         this.tick();
     }
@@ -80,8 +82,14 @@ export class Processor {
         this.tick();
     }
 
-    latch_accumulator(operation: AluOperation){
+    latch_memory(operation: AluOperation){
+        this.storage.set(this.registers.IP, {value: operation.execute()});
+    }
+
+    latch_accumulator(operation: AluOperation, set_flags: boolean = false){
         this.registers.ACC = operation.execute();
+        if(set_flags)
+            this.flags = operation.get_flags();
         this.tick();
     }
 
@@ -150,7 +158,7 @@ export class Processor {
                             this.latch_instruction_pointer(this.alu_operation(Register.IP, arg.value));
                         break;
                         case "stack":
-                            this.latch_instruction_pointer(this.alu_operation(Register.SP, arg.value));
+                            this.latch_instruction_pointer(this.alu_operation(Register.SP, arg.value - 1));
                             break;
                         case "absolute":
                         default:
@@ -168,4 +176,50 @@ export class Processor {
         this.state = ProcessorState.Executing;
     }
 
+    execute(){
+        if(this.state !== ProcessorState.Executing)
+            throw new Error(`Processor have incorrect state: ${this.state}`);
+        if(!this.registers.PR)
+            throw new Error("Processor have no instruction fetched");
+
+        const opcode = this.registers.PR.opcode;
+
+        if(opcode !== Opcode.CMP && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
+            this.latch_accumulator(this.alu_operation(Register.BR, Register.ACC, opcode)
+                , ![Opcode.LD, Opcode.POP].includes(opcode));
+
+        if(opcode === Opcode.INC || opcode === Opcode.DEC)
+            this.latch_accumulator(this.alu_operation(Register.ACC, Register.ZR, opcode), true);
+
+        if(opcode === Opcode.CMP) {
+            this.flags = this.alu_operation(Register.ACC, Register.BR, Opcode.SUB).get_flags();
+            this.tick();
+        }
+
+        if(opcode === Opcode.CALL){
+            this.latch_buffer_register(this.alu_operation(Register.IP));
+            this.latch_instruction_pointer(this.alu_operation(Register.SP));
+            this.latch_memory(this.alu_operation(Register.BR));
+            if((typeof this.registers.PR.arg === 'object') && "addressing" in this.registers.PR.arg)
+                if(this.registers.PR.arg.addressing === "relative")
+                    this.latch_instruction_pointer(this.alu_operation(Register.BR, this.registers.PR.arg.value));
+                else if(this.registers.PR.arg.addressing === "absolute")
+                    this.latch_instruction_pointer(this.alu_operation(Register.ZR, this.registers.PR.arg.value));
+                else
+                    throw new Error(`Invalid addressing for call: ${this.registers.PR.arg.addressing}`);
+            else
+                throw new Error("Call instruction must have Address arg");
+        }
+
+        if(opcode === Opcode.RET){
+            this.latch_instruction_pointer(this.alu_operation(Register.SP, 1, Opcode.SUB));
+            this.latch_data_register();
+            this.latch_instruction_pointer(this.alu_operation(Register.DR));
+        }
+
+        if(STACK_OPERANDS.includes(opcode))
+            this.latch_stack_pointer();
+
+        this.state = ProcessorState.WritingData;
+    }
 }
