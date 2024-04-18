@@ -60,6 +60,7 @@
 		"no-ternary": "off", // WTF ?
 		"no-continue": "off", // WTF ?
 		"no-shadow": "off",
+		"no-bitwise": "off",
 
 		"max-lines": "off"
 	}

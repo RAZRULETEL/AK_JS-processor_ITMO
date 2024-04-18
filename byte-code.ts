@@ -55,10 +55,10 @@ export interface Instruction {
     line: number;
     source: string;
     opcode: Opcode;
-    arg: TargetAddress | Address | Register | number;
+    arg: TargetAddress | Address | number;
 }
 
-interface Data {
+export interface Data {
     value: number;
 }
 
