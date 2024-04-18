@@ -6,8 +6,7 @@ import {
     JMP_CHECK_CONDITION,
     OPERANDS_REQUIRES_DATA_FETCH,
     ProcessorRegisters,
-    ProcessorState,
-    STACK_OPERANDS
+    ProcessorState
 } from "./processor-types";
 import {MemoryStorage} from "./model/memory";
 
@@ -115,6 +114,58 @@ export class Processor {
         else
             throw new Error("Not implemented!"); // TODO: implement data conversion
         this.tick();
+    }
+
+    fetch_instruction(){
+        if(this.state !== ProcessorState.FetchingInstruction)
+            throw new Error(`Processor have incorrect state: ${this.state}`);
+        this.latch_data_register()
+        this.latch_program_register();
+        this.state = ProcessorState.FetchingData;
+    }
+
+    fetch_data(){
+        if(this.state !== ProcessorState.FetchingData)
+            throw new Error(`Processor have incorrect state: ${this.state}`);
+        if(!this.registers.PR)
+            throw new Error("Processor have no instruction fetched");
+        if(OPERANDS_REQUIRES_DATA_FETCH.includes(this.registers.PR.opcode)) {
+            const instruction = this.registers.PR;
+            if (instruction.opcode === Opcode.POP || typeof instruction.arg === 'object') {
+
+                let arg: Address = {addressing: 'absolute', value: 0};
+                if (instruction.opcode !== Opcode.POP)
+                    if (typeof instruction.arg === 'object')
+                        if('addressing' in instruction.arg)
+                            arg = instruction.arg;
+                        else
+                            throw new Error("Invalid instruction");
+
+                this.latch_buffer_register(this.alu_operation(Register.IP));
+                if(instruction.opcode === Opcode.POP){
+                    this.latch_instruction_pointer(this.alu_operation(Register.SP, Register.ZR, Opcode.DEC));
+                }else
+                    switch(arg.addressing) {
+                        case "relative":
+                            this.latch_instruction_pointer(this.alu_operation(Register.IP, arg.value));
+                        break;
+                        case "stack":
+                            this.latch_instruction_pointer(this.alu_operation(Register.SP, arg.value));
+                            break;
+                        case "absolute":
+                        default:
+                            this.latch_instruction_pointer(this.alu_operation(Register.ZR, arg.value));
+                            break;
+                    }
+
+                this.latch_data_register();
+                this.latch_instruction_pointer(this.alu_operation(Register.BR));
+                this.latch_buffer_register(this.alu_operation(Register.BR))
+            }else{// direct load
+                this.latch_buffer_register(this.alu_operation(Register.ZR, instruction.arg));
+            }
+        }
+        this.state = ProcessorState.Executing;
     }
 
 }
