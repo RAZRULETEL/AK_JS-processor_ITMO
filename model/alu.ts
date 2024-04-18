@@ -1,6 +1,6 @@
 import {Opcode, Register} from "../byte-code";
-import {Flags} from "../processor-types";
-import {Processor} from "../processor";
+import {Flags} from "./processor-types";
+import {Processor} from "./processor";
 
 const OPCODE_MATH_OPERATIONS: {[key: number]: (val1: number, val2: number) => number} = {
     [Opcode.ADD]: (val1, val2) => val1 + val2,

@@ -1,5 +1,5 @@
-import {Address, Opcode, Register} from "./byte-code";
-import {AluOperation} from "./model/alu";
+import {Address, Opcode, Register} from "../byte-code";
+import {AluOperation} from "./alu";
 // eslint-disable-next-line sort-imports
 import {
     Flags,
@@ -8,7 +8,7 @@ import {
     ProcessorRegisters,
     ProcessorState
 } from "./processor-types";
-import {MemoryStorage} from "./model/memory";
+import {MemoryStorage} from "./memory";
 
 
 export class Processor {

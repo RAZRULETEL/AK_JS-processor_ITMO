@@ -1,4 +1,4 @@
-import {Data, Instruction, Opcode} from "./byte-code";
+import {Data, Instruction, Opcode} from "../byte-code";
 
 export enum ProcessorState {
     Uninitialized,
