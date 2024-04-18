@@ -1,6 +1,8 @@
 import {Opcode, Register} from "../byte-code";
+import {Processor, REGISTER_BITS_SIZE} from "./processor";
 import {Flags} from "./processor-types";
-import {Processor} from "./processor";
+
+const RADIX = 2;
 
 const OPCODE_MATH_OPERATIONS: {[key: number]: (val1: number, val2: number) => number} = {
     [Opcode.ADD]: (val1, val2) => val1 + val2,
@@ -38,12 +40,15 @@ export class AluOperation {
 
     get_flags(): Flags {
         const val = this.execute();
+        const carry = +(val > (RADIX ** REGISTER_BITS_SIZE - 1) || val < -(RADIX ** REGISTER_BITS_SIZE));
+        const overflow = +(val < -(RADIX ** REGISTER_BITS_SIZE) || val > (RADIX ** REGISTER_BITS_SIZE - 1));
+
         return {
             Zero: +(!!val),
-            Carry: 0,
+            Carry: carry,
             Negative: +(val < 0),
-            Overflow: 0
-        }
+            Overflow: overflow
+        };
     }
 
     static alu_operation_fabric(processor: Processor):
