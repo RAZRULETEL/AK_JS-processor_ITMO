@@ -1,4 +1,5 @@
 import {Address, Opcode, Register} from "./byte-code";
+import {AluOperation} from "./model/alu";
 // eslint-disable-next-line sort-imports
 import {
     Flags,
@@ -49,7 +50,15 @@ export class Processor {
         return <number>this.registers[register];
     }
 
-    latch_instruction_pointer(instruction: Instruction) {
+    private alu_operation = AluOperation.alu_operation_fabric(this);
+
+    latch_instruction_pointer(operation: AluOperation | undefined = undefined) {
+        if(operation){
+            this.registers.IP = operation.execute();
+            this.tick();
+            return;
+        }
+
         this.registers.IP++;
         const instruction = this.registers.PR;
         if (instruction &&
@@ -72,8 +81,9 @@ export class Processor {
         this.tick();
     }
 
-    zero() {
-        return this.flags.Zero;
+    latch_accumulator(operation: AluOperation){
+        this.registers.ACC = operation.execute();
+        this.tick();
     }
 
     latch_stack_pointer(){
@@ -90,6 +100,11 @@ export class Processor {
                     this.registers.SP--;
                 break;
             }
+        this.tick();
+    }
+
+    latch_buffer_register(operation: AluOperation) {
+        this.registers.IP = operation.execute();
         this.tick();
     }
 
