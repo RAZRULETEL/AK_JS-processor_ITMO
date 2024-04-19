@@ -157,6 +157,7 @@ export class Processor {
         this.state = ProcessorState.Executing;
     }
 
+    // eslint-disable-next-line max-statements
     execute(){
         if(this.state !== ProcessorState.Executing)
             throw new Error(`Processor have incorrect state: ${this.state}`);
@@ -236,5 +237,23 @@ export class Processor {
                 return this.alu_operation(Register.SP, this.registers.PR.arg.value);
         else
             throw new Error("Call instruction must have Address arg");
+    }
+    
+    start_simulation(time_limit: number) {
+        try {
+            while (this.time < time_limit) {
+                this.state = ProcessorState.FetchingInstruction;
+                this.fetch_instruction();
+                this.fetch_data();
+                this.execute();
+                // @ts-expect-error TS don't know that state changes in functions
+                if (this.state === ProcessorState.Halted)
+                    break;
+                this.write_data();
+                this.latch_instruction_pointer();
+            }
+        }catch (err: unknown) {
+            console.error(`Simulation failed: ${(err as Error).message}`);
+        }
     }
 }
