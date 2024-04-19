@@ -1,10 +1,13 @@
 import * as fs from "fs";
 import {ComparisonOperator, FunctionContainer, LexicalEnvironment, MathOperators, Syntax} from "./translator-types";
-import {Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
+import {Data, Instruction, Opcode} from "./byte-code";
 
 const CLI_ARGS_COUNT = 4;
 const INPUT_FILE_ARG_INDEX = 2;
 const OUTPUT_FILE_ARG_INDEX = 3;
+
+const OUTPUT_ADDRESS = 1;
+const INPUT_ADDRESS = 2;
 
 // Accept two arguments: input file and output file.
 if(process.argv.length !== CLI_ARGS_COUNT) {
@@ -24,11 +27,18 @@ console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
 
 program.push(...Object.values(mappings).flatMap(el => el.body));
 
-fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join("\n"), 'utf8');
+const output = {
+    output: OUTPUT_ADDRESS,
+    input: INPUT_ADDRESS,
+    program,
+};
+
+fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
+fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
 
 
 // Translate the input file.
-function translate(input_data: string): Instruction[] {
+function translate(input_data: string): (Instruction | Data)[] {
     const result: Instruction[] = [];
 
     const root: LexicalEnvironment = {
@@ -51,7 +61,56 @@ function translate(input_data: string): Instruction[] {
     } else
         result.push(...parse(input_data, root));
 
-    return result;
+    return post_process(result, root);
+}
+
+// eslint-disable-next-line max-statements
+function post_process(program: Instruction[], lexical_environment: LexicalEnvironment): (Instruction | Data)[]{
+    const result: (Instruction | Data)[] = [{
+        line: 0,
+        source: "",
+        opcode: Opcode.JMP,
+        arg: {addressing: 'relative', value: lexical_environment.variables.length + 1 + 1}
+    }, {value: OUTPUT_ADDRESS}, {value: INPUT_ADDRESS}
+        , ...lexical_environment.variables.map(() => ({value: 0}))
+    ];
+    const variables_offset = result.length - lexical_environment.variables.length
+
+    program.push({
+        line: 0,
+        source: "",
+        opcode: Opcode.HALT,
+        arg: 0
+    });
+
+    const start = result.length + program.length;
+    let offset = 0;
+    for(const func of Object.values(mappings)) {
+        func.address = start + offset;
+        offset += func.body.length;
+    }
+
+    for (const instruction of program) {
+        if(typeof instruction.arg === 'object') {
+            if('type' in instruction.arg){
+                const arg = instruction.arg;
+                if(arg.type === 'variable') {
+                    instruction.arg = {
+                        addressing: 'absolute',
+                        value: lexical_environment.variables.indexOf(arg.name) + variables_offset
+                    }
+                }
+                if(arg.type === 'function') {
+                    instruction.arg = {
+                        addressing: 'absolute',
+                        value: mappings[arg.name].address
+                    }
+                }
+            }
+        }
+    }
+
+    return result.concat(program, ...Object.values(mappings).flatMap(el => el.body));
 }
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
@@ -280,7 +339,7 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
 
     result.push({
         line: 0,
-        source: `second math arg save ${second}`,
+        source: second,
         opcode: Opcode.PUSH,
         arg: 0
     });
@@ -292,7 +351,7 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
 
     result.push({
         line: 0,
-        source: `second math arg load ${input}`,
+        source: input,
         opcode: MathOperators[action],
         arg: {addressing: 'stack', value: 0}
     },{
@@ -327,7 +386,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
 
         result.push({
             line: 0,
-            source: `second logic arg save ${second}`,
+            source: second,
             opcode: Opcode.PUSH,
             arg: 0
         });
@@ -339,7 +398,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
 
         result.push({
             line: 0,
-            source: `second logic arg load ${input}`,
+            source: input,
             opcode: Opcode.CMP,
             arg: {addressing: 'stack', value: 0}
         },{
@@ -401,7 +460,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
 
     const positive_end_jmp: Instruction = {
         line: 0,
-        source: "after pos if jmp",
+        source: second,
         opcode: Opcode.JMP,
         arg: 0
     };
@@ -435,8 +494,6 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
             else
                 result.push(...parse(`(${input})`, lexical_environment));
 
-        // console.log("RES", result);
-
         return result;
     }
 }
@@ -449,46 +506,46 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
         else if (lexical_environment.parent)
             return {
                 line: 0,
-                source: `load ${variable}`,
+                source: variable,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
                 arg: {type: 'stack', name: variable}
             }
         else
             return {
                 line: 0,
-                source: `load ${variable}`,
+                source: variable,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
                 arg: {type: 'variable', name: variable}
             }
     else
         return {
             line: 0,
-            source: `load direct ${variable}`,
+            source: variable,
             opcode: compare_only ? Opcode.CMP : Opcode.LD,
             arg: +variable
         }
 }
 
-function set_value(variable: string, lexical_environment: LexicalEnvironment): Instruction {
+function set_value(variable: string, lexical_environment: LexicalEnvironment, source: string = ""): Instruction {
     if (isNaN(+variable))
         if (!lexical_environment.variables.includes(variable))
             throw new Error(`Variable ${variable} is not defined.`);
         else if (lexical_environment.parent)
             return {
                 line: 0,
-                source: `set ${variable}`,
+                source,
                 opcode: Opcode.ST,
-                arg: {type: 'stack', name: variable}
+                arg: {addressing: 'stack', value: lexical_environment.variables.reverse().indexOf(variable)}
             }
         else
             return {
                 line: 0,
-                source: `set ${variable}`,
+                source,
                 opcode: Opcode.ST,
                 arg: {type: 'variable', name: variable}
             }
     else
-        throw new Error(`Variable must string: ${variable}`);
+        throw new Error(`Variable must be string: ${variable}`);
 }
 
 
@@ -515,7 +572,7 @@ function parse_setq(input: string, lexical_environment: LexicalEnvironment): Ins
     if(!lexical_environment.variables.includes(first))
         lexical_environment.variables.push(first)
 
-    result.push(set_value(first, lexical_environment));
+    result.push(set_value(first, lexical_environment, input));
     return result;
 }
 
