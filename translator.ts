@@ -34,7 +34,7 @@ const output = {
 };
 
 fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
-fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
+// fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
 
 
 // Translate the input file.
@@ -64,7 +64,6 @@ function translate(input_data: string): (Instruction | Data)[] {
     return post_process(result, root);
 }
 
-// eslint-disable-next-line max-statements
 function post_process(program: Instruction[], lexical_environment: LexicalEnvironment): (Instruction | Data)[]{
     const result: (Instruction | Data)[] = [{
         line: 0,
@@ -151,7 +150,6 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
     return result;
 }
 
-// eslint-disable-next-line max-statements
 function cut_expression(input_data: string, save_brackets: boolean = true): string {
     let lvl = 0;
     let index: number = 0;
@@ -216,7 +214,7 @@ function expression_to_parts(input_data: string): { action: string, first: strin
 }
 
 
-// eslint-disable-next-line max-lines-per-function,max-statements
+
 function parse_function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
     const environment: LexicalEnvironment = {
         parent: lexical_environment,
@@ -245,7 +243,7 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         body
     };
 
-    parse_body(input_data.substring(offset));
+    parse_function_body(input_data.substring(offset), lexical_environment);
     if(environment.variables.length > 0){
         body.push(set_value(environment.variables[0], environment));
         body.push(...environment.variables.reverse().map(variable => ({
@@ -261,25 +259,24 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         opcode: Opcode.RET,
         arg: 0
     });
-
-    // console.log("Defined", name);
-
-    function parse_body(input_body: string){
-        if(input_body.startsWith(")"))
-            throw new Error("Function must have body expression!");
-        if (input_body.startsWith("((")) {
-            body.push(...parse(input_body.substring(1), environment));
-            // let i = 1 + body[body.length - 1].source.length;
-            // while (input_data[i] != ")") {
-            body.push(...parse(input_body, environment));
-            throw new Error("Not implemented!"); // TODO
-            // }
-        } else {
-            body.push(...parse(input_body, environment));
-        }
-    }
 }
 
+function parse_function_body(input_body: string, lexical_environment: LexicalEnvironment): Instruction[]{
+    const body: Instruction[] = [];
+    if(input_body.startsWith(")"))
+        throw new Error("Function must have body expression!");
+    if (input_body.startsWith("((")) {
+        let body_expressions = input_body.substring(1, input_body.length - 1).trim();
+        while (body_expressions) {
+            const expression = cut_expression(body_expressions);
+            body.push(...parse(expression, lexical_environment));
+            body_expressions = body_expressions.substring(expression.length).trim();
+        }
+    } else {
+        body.push(...parse(input_body, lexical_environment));
+    }
+    return body;
+}
 
 function parse_call_function(name: string, args: string, lexical_environment: LexicalEnvironment): Instruction[]{
     const result: Instruction[] = []
@@ -306,7 +303,6 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
 
     const variables = args.matchAll(/(\w+|\([^() ]+\))/igu);
     for(const variable of variables){
-        console.log(variable);
         result.push(load_value(variable[0], lexical_environment));
         result.push({
             line: 0,
@@ -333,10 +329,7 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
 
     const result: Instruction[] = [];
 
-    if (second.startsWith("("))
-        result.push(...parse(second, lexical_environment));
-    else
-        result.push(load_value(second, lexical_environment));
+    result.push(...parse_or_load(second, lexical_environment));
 
     result.push({
         line: 0,
@@ -345,10 +338,7 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
         arg: 0
     });
 
-    if (first.startsWith("("))
-        result.push(...parse(first, lexical_environment));
-    else
-        result.push(load_value(first, lexical_environment));
+    result.push(...parse_or_load(first, lexical_environment));
 
     result.push({
         line: 0,
@@ -366,7 +356,8 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
     return result;
 }
 
-// eslint-disable-next-line max-lines-per-function,max-statements
+
+// eslint-disable-next-line max-lines-per-function
 function parse_logical_expression(input: string, lexical_environment: LexicalEnvironment): [Instruction[], number | null] {
     const result: Instruction[] = [];
 
@@ -380,10 +371,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
         throw new Error(`Invalid logical operator, expected one of [${Object.keys(ComparisonOperator).join(", ")}]: ${action}`);
 
     if (input.startsWith("(")) { // condition is an expression
-        if (second.startsWith("("))
-            result.push(...parse(second, lexical_environment));
-        else
-            result.push(load_value(second, lexical_environment));
+        result.push(...parse_or_load(second, lexical_environment));
 
         result.push({
             line: 0,
@@ -392,10 +380,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
             arg: 0
         });
 
-        if(first.startsWith("("))
-            result.push(...parse(first, lexical_environment));
-        else
-            result.push(load_value(first, lexical_environment)); // eslint-disable-next-line no-magic-numbers
+        result.push(...parse_or_load(first, lexical_environment));
 
         result.push({
             line: 0,
@@ -404,7 +389,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
             arg: {addressing: 'stack', value: 0}
         },{
             line: 0,
-            source: `second logic arg clear`,
+            source: input,
             opcode: Opcode.FLUSH,
             arg: 0
         })
@@ -430,7 +415,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
         jmp = {
             line: 0,
             source: input,
-            opcode: Opcode.JNZ,
+            opcode: Opcode.JZ,
             arg: 0
         }
     }
@@ -444,12 +429,10 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
  * @param input_data
  * @param lexical_environment
  */
-// eslint-disable-next-line max-lines-per-function,max-statements
 function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
 
     const {first, second, third} = expression_to_parts(input_data);
-
     if(!third)
         throw new Error("If statement always requires else branch");
 
@@ -481,10 +464,8 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
         if (!input) return [];
 
         const result: Instruction[] = [];
-
         if (input.startsWith("(")) {// Multiple expressions
             while (input.length > 0) {
-                console.log(input);
                 const expression = cut_expression(input);
                 result.push(...parse(expression, lexical_environment));
                 input = input.substring(expression.length);
@@ -499,6 +480,83 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     }
 }
 
+function parse_setq(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    const result: Instruction[] = [];
+
+    const {first, second} = expression_to_parts(input);
+    if(!first.match(/^\w(\w|\d)*$/ui))
+        throw new Error(`Invalid variable name: ${first}`);
+
+    if(second.startsWith("("))
+        result.push(...parse(second, lexical_environment));
+    else
+        result.push(load_value(second, lexical_environment));
+
+    if(!lexical_environment.variables.includes(first))
+        lexical_environment.variables.push(first)
+
+    result.push(set_value(first, lexical_environment, input));
+    return result;
+}
+
+function parse_while(input: string, lexical_environment: LexicalEnvironment): Instruction[]{
+    const result: Instruction[] = [];
+
+    const {action, first, second} = expression_to_parts(input);
+    const [condition, jmp] = parse_logical_expression(first, lexical_environment);
+
+    result.push(...condition);
+
+    const body: Instruction[] = [];
+    if(second.startsWith("((")){
+        let body_expressions = second.substring(1, second.length - 1).trim();
+        while (body_expressions) {
+            const expression = cut_expression(body_expressions);
+            body.push(...parse(expression, lexical_environment));
+            body_expressions = body_expressions.substring(expression.length).trim();
+        }
+    }else
+        body.push(...parse(second, lexical_environment));
+
+    if(jmp)
+        condition[jmp].arg = {addressing: "relative", value: body.length + 1};
+
+    result.push(...body, {
+        line: 0,
+        source: `${action} ${first}`,
+        opcode: Opcode.JMP,
+        arg: {addressing: "relative", value: -body.length - 1 - condition.length}
+    });
+
+    return result
+}
+
+function parse_print(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    const result: Instruction[] = [];
+
+    const {first} = expression_to_parts(input);
+
+    if(first.startsWith("(")){
+        const expression = cut_expression(first);
+        result.push(...parse(expression, lexical_environment));
+    }else
+        result.push(load_value(first, lexical_environment));
+
+    result.push({
+        line: 0,
+        source: input,
+        opcode: Opcode.ST,
+        arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
+    });
+
+    return result
+}
+
+function parse_or_load(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
+    if (input.startsWith("("))
+        return  parse(input, lexical_environment);
+    return [load_value(input, lexical_environment)];
+}
 
 function load_value(variable: string, lexical_environment: LexicalEnvironment, compare_only: boolean = false): Instruction {
     if (isNaN(+variable))
@@ -555,78 +613,4 @@ function match_or_throw(text: string, regexp: RegExp, message?: string){
     if(match)
         return match[0];
     throw new Error(message);
-}
-
-
-function parse_setq(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
-    const result: Instruction[] = [];
-
-    const {first, second} = expression_to_parts(input);
-    if(!first.match(/^\w(\w|\d)*$/ui))
-        throw new Error(`Invalid variable name: ${first}`);
-
-    if(second.startsWith("("))
-        result.push(...parse(second, lexical_environment));
-    else
-        result.push(load_value(second, lexical_environment));
-
-    if(!lexical_environment.variables.includes(first))
-        lexical_environment.variables.push(first)
-
-    result.push(set_value(first, lexical_environment, input));
-    return result;
-}
-
-function parse_while(input: string, lexical_environment: LexicalEnvironment): Instruction[]{
-    const result: Instruction[] = [];
-
-    const {action, first, second} = expression_to_parts(input);
-    const [condition, jmp] = parse_logical_expression(first, lexical_environment);
-
-    result.push(...condition);
-
-    const body: Instruction[] = [];
-    if(second.startsWith("((")){
-        let body_expressions = second.substring(1, second.length - 1).trim();
-        while (body_expressions) {
-            const expression = cut_expression(body_expressions);
-            console.log(expression, ...parse(expression, lexical_environment));
-            body.push(...parse(expression, lexical_environment));
-            body_expressions = body_expressions.substring(expression.length).trim();
-        }
-    }else
-        body.push(...parse(second, lexical_environment));
-
-    if(jmp)
-        condition[jmp].arg = {addressing: "relative", value: body.length + 1};
-
-    result.push(...body, {
-        line: 0,
-        source: `${action} ${first}`,
-        opcode: Opcode.JMP,
-        arg: {addressing: "relative", value: -body.length - 1 - condition.length}
-    });
-
-    return result
-}
-
-function parse_print(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
-    const result: Instruction[] = [];
-
-    const {first} = expression_to_parts(input);
-
-    if(first.startsWith("(")){
-        const expression = cut_expression(first);
-        result.push(...parse(expression, lexical_environment));
-    }else
-        result.push(load_value(first, lexical_environment));
-
-    result.push({
-        line: 0,
-        source: input,
-        opcode: Opcode.ST,
-        arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
-    });
-
-    return result
 }
