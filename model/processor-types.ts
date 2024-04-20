@@ -1,12 +1,12 @@
 import {Data, Instruction, Opcode} from "../byte-code";
 
 export enum ProcessorState {
-    Uninitialized,
-    FetchingInstruction,
-    FetchingData,
-    Executing,
-    WritingData,
-    Halted
+    Uninitialized = "Uninitialized",
+    FetchingInstruction = "FetchingInstruction",
+    FetchingData = "FetchingData",
+    Executing = "Executing",
+    WritingData = "WritingData",
+    Halted = "Halted"
 }
 
 export interface Flags {

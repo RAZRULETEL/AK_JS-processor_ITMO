@@ -12,6 +12,7 @@ import {MemoryStorage} from "./memory";
 import fs from "fs";
 
 export const REGISTER_BITS_SIZE = 32;
+const INPUT_FILE_ARG = 2;
 const MEMORY_SIZE = 1024;
 const PROB1_TIME_LIMIT = 1_000_000;
 
@@ -59,7 +60,7 @@ export class Processor {
 
     private alu_operation = AluOperation.alu_operation_fabric(this);
 
-    latch_instruction_pointer(operation: AluOperation | undefined = undefined) {
+    private latch_instruction_pointer(operation: AluOperation | undefined = undefined) {
         if(operation){
             this.registers.IP = operation.execute();
             this.tick();
@@ -85,35 +86,35 @@ export class Processor {
         this.tick();
     }
 
-    latch_data_register(){
+    private latch_data_register(){
         this.registers.DR = this.storage.get(this.registers.IP);
         this.tick();
     }
 
-    latch_memory(operation: AluOperation){
+    private latch_memory(operation: AluOperation){
         this.storage.set(this.registers.IP, {value: operation.execute()});
     }
 
-    latch_accumulator(operation: AluOperation, set_flags: boolean = false){
+    private latch_accumulator(operation: AluOperation, set_flags: boolean = false){
         this.registers.ACC = operation.execute();
         if(set_flags)
             this.flags = operation.get_flags();
         this.tick();
     }
 
-    latch_stack_pointer(){
-        if(this.registers.PR)
-            switch (this.registers.PR.opcode){
+    private latch_stack_pointer(){
+        if(this.registers.PR) {
+            switch (this.registers.PR.opcode) {
                 case Opcode.POP:
                 case Opcode.FLUSH:
                 case Opcode.RET:
                     this.registers.SP++;
-                break;
+                    break;
                 case Opcode.PUSH:
                 case Opcode.CALL:
                 default:
                     this.registers.SP--;
-                break;
+                    break;
             }
             if(this.registers.SP < 0)
                 this.registers.SP = this.storage.memory_size + this.registers.SP;
@@ -123,12 +124,12 @@ export class Processor {
         this.tick();
     }
 
-    latch_buffer_register(operation: AluOperation) {
-        this.registers.IP = operation.execute();
+    private latch_buffer_register(operation: AluOperation) {
+        this.registers.BR = operation.execute();
         this.tick();
     }
 
-    latch_program_register(){
+    private latch_program_register(){
         const instruction = this.registers.DR;
         if("opcode" in instruction)
             this.registers.PR = instruction;
@@ -137,7 +138,7 @@ export class Processor {
         this.tick();
     }
 
-    fetch_instruction(){
+    private fetch_instruction(){
         if(this.state !== ProcessorState.FetchingInstruction)
             throw new Error(`Processor have incorrect state: ${this.state}`);
         this.latch_data_register()
@@ -145,7 +146,7 @@ export class Processor {
         this.state = ProcessorState.FetchingData;
     }
 
-    fetch_data(){
+    private fetch_data(){
         if(this.state !== ProcessorState.FetchingData)
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
@@ -162,7 +163,7 @@ export class Processor {
 
                 this.latch_data_register();
                 this.latch_instruction_pointer(this.alu_operation(Register.BR));
-                this.latch_buffer_register(this.alu_operation(Register.BR))
+                this.latch_buffer_register(this.alu_operation(Register.DR))
             }else{// direct load
                 this.latch_buffer_register(this.alu_operation(Register.ZR, instruction.arg));
             }
@@ -171,7 +172,7 @@ export class Processor {
     }
 
     // eslint-disable-next-line max-statements
-    execute(){
+    private execute(){
         if(this.state !== ProcessorState.Executing)
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
@@ -217,7 +218,7 @@ export class Processor {
         this.state = ProcessorState.WritingData;
     }
 
-    write_data(){
+    private write_data(){
         if(this.state !== ProcessorState.WritingData)
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
@@ -240,7 +241,7 @@ export class Processor {
         this.state = ProcessorState.FetchingInstruction;
     }
 
-    fetch_instruction_address(): AluOperation{
+    private fetch_instruction_address(): AluOperation{
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
         if((typeof this.registers.PR.arg === 'object') && "addressing" in this.registers.PR.arg)
@@ -252,6 +253,11 @@ export class Processor {
                 return this.alu_operation(Register.SP, this.registers.PR.arg.value);
         else
             throw new Error("Call instruction must have Address arg");
+    }
+
+    get_state(): string{
+        const flags = `N: ${this.flags.Negative} Z: ${this.flags.Zero} V: ${this.flags.Overflow} C: ${this.flags.Carry}`;
+        return `t: ${this.time}, state: ${this.state}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "none"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, ZR: ${this.registers.ZR}, ${flags}`
     }
     
     start_simulation(time_limit: number) {
@@ -267,8 +273,20 @@ export class Processor {
                 this.write_data();
                 this.latch_instruction_pointer();
             }
+            if(this.time >= time_limit)
+                console.warn(`Time limit reached. ${this.get_state()}`);
         }catch (err: unknown) {
             console.error(`Simulation failed: ${(err as Error).message}`);
         }
     }
+}
+
+
+const program_code_file = process.argv[INPUT_FILE_ARG];
+if(program_code_file) {
+    const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as
+        {program: Array<Instruction | Data>, input: number, output: number};
+    const memory = new MemoryStorage(MEMORY_SIZE, input_data);
+    const processor = new Processor(memory);
+    processor.start_simulation(PROB1_TIME_LIMIT);
 }
