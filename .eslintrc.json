@@ -19,7 +19,7 @@
 	"plugins": ["@typescript-eslint"],
 	"rules": {
 		"no-magic-numbers": ["error", {"ignore":  [0, 1]}],
-		"max-statements": ["error", 15, { "ignoreTopLevelFunctions": true }],
+		"max-statements": ["error", 25, { "ignoreTopLevelFunctions": true }],
 		"no-use-before-define": ["error", {
 			"functions": false,
 			"classes": true,
@@ -33,7 +33,6 @@
 		"no-warning-comments": "warn",
 		"no-negated-condition": "warn",
 
-//		"@typescript-eslint/strict-boolean-expressions": "off", //
 		"@typescript-eslint/no-unsafe-enum-comparison": "off", // Breaks switch/case
 		"@typescript-eslint/no-unnecessary-condition": "off", // Stupid, thinks null is true
 

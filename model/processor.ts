@@ -276,6 +276,7 @@ export class Processor {
             if(this.time >= time_limit)
                 console.warn(`Time limit reached. ${this.get_state()}`);
         }catch (err: unknown) {
+            console.log(this.get_state())
             console.error(`Simulation failed: ${(err as Error).message}`);
         }
     }
@@ -284,9 +285,12 @@ export class Processor {
 
 const program_code_file = process.argv[INPUT_FILE_ARG];
 if(program_code_file) {
-    const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as
-        {program: Array<Instruction | Data>, input: number, output: number};
-    const memory = new MemoryStorage(MEMORY_SIZE, input_data);
-    const processor = new Processor(memory);
-    processor.start_simulation(PROB1_TIME_LIMIT);
+    if(fs.existsSync(program_code_file)) {
+        const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as
+            { program: Array<Instruction | Data>, input: number, output: number };
+        const memory = new MemoryStorage(MEMORY_SIZE, input_data);
+        const processor = new Processor(memory);
+        processor.start_simulation(PROB1_TIME_LIMIT);
+    }else
+        console.error(`File ${program_code_file} does not exists!`);
 }

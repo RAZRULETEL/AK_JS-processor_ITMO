@@ -11,31 +11,35 @@ const INPUT_ADDRESS = 2;
 
 // Accept two arguments: input file and output file.
 if(process.argv.length !== CLI_ARGS_COUNT) {
-    console.log(`Usage: node ${ process.argv[1] } <input file> <output file>`);
+    console.error(`Usage: node ${ process.argv[1] } <input file> <output file>`);
     process.exit(1);
 }
 const input_file = process.argv[INPUT_FILE_ARG_INDEX];
 const output_file = process.argv[OUTPUT_FILE_ARG_INDEX];
 
-// Read the input file.
-const input_data = fs.readFileSync(input_file, 'utf8');
-
 const mappings: { [key: string]: FunctionContainer } = {}; // functions address mapping
 
-const program = translate(input_data);
-console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
+// Read the input file.
+if(fs.existsSync(input_file)) {
+    const input_data = fs.readFileSync(input_file, 'utf8');
 
-program.push(...Object.values(mappings).flatMap(el => el.body));
+    const program = translate(input_data);
+    console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
 
-const output = {
-    output: OUTPUT_ADDRESS,
-    input: INPUT_ADDRESS,
-    program,
-};
+    program.push(...Object.values(mappings).flatMap(el => el.body));
 
-fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
-// fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
+    const output = {
+        output: OUTPUT_ADDRESS,
+        input: INPUT_ADDRESS,
+        program,
+    };
 
+    fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
+    // fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
+}else {
+    console.error(`Input file ${ input_file } does not exists!`);
+    process.exit(1);
+}
 
 // Translate the input file.
 function translate(input_data: string): (Instruction | Data)[] {
@@ -108,7 +112,7 @@ function post_process(program: Instruction[], lexical_environment: LexicalEnviro
             }
         }
     }
-
+    // TODO: post process functions
     return result.concat(program, ...Object.values(mappings).flatMap(el => el.body));
 }
 
@@ -178,7 +182,7 @@ function cut_expression(input_data: string, save_brackets: boolean = true): stri
         if (index > input_data.length)
             throw new Error(`Expression not closed: ${input_data}`);
     } while (lvl > 0)
-    return input_data.substring(save_brackets ? 0 : 1, index - +!save_brackets);
+    return input_data.substring(save_brackets ? 0 : 1, index - +!save_brackets).trim();
 }
 
 function expression_to_parts(input_data: string): { action: string, first: string, second: string, third?: string } {
@@ -243,7 +247,7 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         body
     };
 
-    parse_function_body(input_data.substring(offset), lexical_environment);
+    body.push(...parse_function_body(input_data.substring(offset), environment));
     if(environment.variables.length > 0){
         body.push(set_value(environment.variables[0], environment));
         body.push(...environment.variables.reverse().map(variable => ({
@@ -314,7 +318,7 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
 
     result.push({
         line: 0,
-        source: `call ${name}`,
+        source: `(${name} (${args}))`,
         opcode: Opcode.CALL,
         arg: {type: 'function', name}
     })

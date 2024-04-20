@@ -1,8 +1,0 @@
-((setq x 6)
- (while (> x 0) (setq x (+ x 1)))
- (while (> x 0) ((setq x (+ x 1))(print x)))
- (    function    factorial (x     h     k)
-                    (if                 (>=   x     0) 1          (* x (factorial (- x 1)))))
- (function test(a b c)(print a))
- (function ter()())
-)

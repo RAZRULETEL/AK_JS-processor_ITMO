@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "translate": "npx tsc translator.ts & node translator.js",
+    "build": "npx tsc -p tsconfig.json",
+    "translate": "node translator.js",
+    "simulate": "node model/processor.js",
     "dev-translate": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node translator.js prob1.lisp out.lisp\""
   },
   "keywords": [],
