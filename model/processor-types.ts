@@ -29,10 +29,10 @@ export interface ProcessorRegisters{
 export const JMP_CHECK_CONDITION: {[key: number]: (value: Flags) => boolean} = {
     [Opcode.EQ]: (flags) => flags.Zero === 1,
     [Opcode.NEQ]: (flags) => flags.Zero === 0,
-    [Opcode.GT]: (flags) => flags.Carry === 1,
-    [Opcode.GE]: (flags) => flags.Carry === 1 || flags.Zero === 1,
-    [Opcode.LT]: (flags) => flags.Carry === 0 && flags.Zero === 0,
-    [Opcode.LE]: (flags) => flags.Carry === 0,
+    [Opcode.GT]: (flags) => (flags.Zero === 0) && (flags.Negative === flags.Overflow),
+    [Opcode.GE]: (flags) => flags.Negative === flags.Overflow,
+    [Opcode.LT]: (flags) => flags.Negative !== flags.Overflow,
+    [Opcode.LE]: (flags) => flags.Zero === 1,
     [Opcode.JNZ]: (flags) => flags.Zero === 0,
     [Opcode.JZ]: (flags) => flags.Zero === 1
 }

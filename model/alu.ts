@@ -11,9 +11,7 @@ const OPCODE_MATH_OPERATIONS: {[key: number]: (val1: number, val2: number) => nu
     [Opcode.DIV]: (val1, val2) => val1 / val2,
     [Opcode.MOD]: (val1, val2) => val1 % val2,
     [Opcode.DEC]: (val1) => val1 - 1,
-    [Opcode.INC]: (val1) => val1 + 1,
-    [Opcode.LD]: (val1) => val1,
-    [Opcode.POP]: (val1) => val1
+    [Opcode.INC]: (val1) => val1 + 1
 }
 
 export class AluOperation {
@@ -44,7 +42,7 @@ export class AluOperation {
         const overflow = +(val < -(RADIX ** REGISTER_BITS_SIZE) || val > (RADIX ** REGISTER_BITS_SIZE - 1));
 
         return {
-            Zero: +(!!val),
+            Zero: +(!val),
             Carry: carry,
             Negative: +(val < 0),
             Overflow: overflow

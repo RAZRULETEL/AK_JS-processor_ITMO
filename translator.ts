@@ -142,7 +142,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 break;
             default:
                 if (match && mappings[match[0]] !== undefined)
-                    result.push(...parse_call_function(match[0], cut_expression(input_data.substring(1 + match[0].length)).trim(), lexical_environment));
+                    result.push(...parse_call_function(match[0], cut_expression(input_data.substring(1 + match[0].length)), lexical_environment));
                 break;
         }
     else if(cut_expression(input_data, false))
@@ -184,6 +184,7 @@ function cut_expression(input_data: string, save_brackets: boolean = true): stri
 }
 
 function expression_to_parts(input_data: string): { action: string, first: string, second: string, third?: string } {
+    input_data = input_data.trim();
     if (!input_data.startsWith("("))
         throw new Error(`Expression must starts with '(': ${  input_data}`);
     input_data = cut_expression(input_data, false);
@@ -197,7 +198,7 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     else
         first_expression = input_data.split(" ")[1];
 
-    let second_expression = input_data.substring(action.length + 1 + first_expression.length + 1);
+    let second_expression = input_data.substring(action.length + 1 + first_expression.length).trim();
     if (second_expression.startsWith("("))
         second_expression = cut_expression(second_expression);
     else
@@ -378,11 +379,11 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
     if(ComparisonOperator[action] === undefined)
         throw new Error(`Invalid logical operator, expected one of [${Object.keys(ComparisonOperator).join(", ")}]: ${action}`);
 
-    if (input.startsWith("(")) { // condition is an expression // TODO: add support for multiple expressions
+    if (input.startsWith("(")) { // condition is an expression
         if (second.startsWith("("))
             result.push(...parse(second, lexical_environment));
         else
-            result.push(load_value(second, lexical_environment, true));
+            result.push(load_value(second, lexical_environment));
 
         result.push({
             line: 0,
@@ -579,8 +580,6 @@ function parse_setq(input: string, lexical_environment: LexicalEnvironment): Ins
 function parse_while(input: string, lexical_environment: LexicalEnvironment): Instruction[]{
     const result: Instruction[] = [];
 
-    console.log(expression_to_parts(input));
-
     const {action, first, second} = expression_to_parts(input);
     const [condition, jmp] = parse_logical_expression(first, lexical_environment);
 
@@ -588,11 +587,12 @@ function parse_while(input: string, lexical_environment: LexicalEnvironment): In
 
     const body: Instruction[] = [];
     if(second.startsWith("((")){
-        let body_expressions = second.substring(1, second.length - 1);
+        let body_expressions = second.substring(1, second.length - 1).trim();
         while (body_expressions) {
             const expression = cut_expression(body_expressions);
+            console.log(expression, ...parse(expression, lexical_environment));
             body.push(...parse(expression, lexical_environment));
-            body_expressions = body_expressions.substring(expression.length);
+            body_expressions = body_expressions.substring(expression.length).trim();
         }
     }else
         body.push(...parse(second, lexical_environment));

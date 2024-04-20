@@ -1,3 +1,4 @@
+import {Data, Instruction, Opcode, Register} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
@@ -6,11 +7,15 @@ import {
     ProcessorState,
     STACK_OPERANDS
 } from "./processor-types";
-import {Opcode, Register} from "../byte-code";
 import {AluOperation} from "./alu";
 import {MemoryStorage} from "./memory";
+import fs from "fs";
 
 export const REGISTER_BITS_SIZE = 32;
+const MEMORY_SIZE = 1024;
+const PROB1_TIME_LIMIT = 1_000_000;
+
+
 
 
 export class Processor {
@@ -48,6 +53,7 @@ export class Processor {
     }
 
     get_register(register: Register): number {
+        if(register === Register.DR && "value" in this.registers.DR) return this.registers.DR.value;
         return <number>this.registers[register];
     }
 
@@ -65,8 +71,10 @@ export class Processor {
         if (instruction &&
             (typeof instruction.arg === 'object')
             && "addressing" in instruction.arg
-            && JMP_CHECK_CONDITION[instruction.arg.value]
-            && JMP_CHECK_CONDITION[instruction.arg.value](this.flags)) {
+            && ((JMP_CHECK_CONDITION[instruction.opcode]
+            && JMP_CHECK_CONDITION[instruction.opcode](this.flags))
+            || (instruction.opcode === Opcode.JMP && this.registers.ZR === 0))
+        ) {
                 if (instruction.arg.addressing === "relative")
                     this.registers.IP += instruction.arg.value;
                 else if (instruction.arg.addressing === "absolute")
@@ -107,6 +115,11 @@ export class Processor {
                     this.registers.SP--;
                 break;
             }
+            if(this.registers.SP < 0)
+                this.registers.SP = this.storage.memory_size + this.registers.SP;
+            else if(this.registers.SP >= this.storage.memory_size)
+                this.registers.SP %= this.storage.memory_size;
+        }
         this.tick();
     }
 
@@ -171,9 +184,11 @@ export class Processor {
             return;
         }
 
-        if(opcode !== Opcode.CMP && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
-            this.latch_accumulator(this.alu_operation(Register.BR, Register.ACC, opcode)
-                , ![Opcode.LD, Opcode.POP].includes(opcode));
+        if(![Opcode.CMP, Opcode.LD, Opcode.POP].includes(opcode) && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
+            this.latch_accumulator(this.alu_operation(Register.ACC, Register.BR, opcode), true);
+
+        if(opcode === Opcode.LD || opcode === Opcode.POP)
+            this.latch_accumulator(this.alu_operation(Register.BR), false);
 
         if(opcode === Opcode.INC || opcode === Opcode.DEC)
             this.latch_accumulator(this.alu_operation(Register.ACC, Register.ZR, opcode), true);

@@ -11,12 +11,12 @@ export enum Syntax {
 }
 
 export const ComparisonOperator: { [key: string]: Opcode } = {
-    "=": Opcode.EQ,
-    "!=": Opcode.NEQ,
-    "<": Opcode.LT,
-    ">": Opcode.GT,
-    "<=": Opcode.LE,
-    ">=": Opcode.GE
+    "=": Opcode.JNZ,
+    "!=": Opcode.JZ,
+    "<": Opcode.GE,
+    ">": Opcode.LE,
+    "<=": Opcode.GT,
+    ">=": Opcode.LT
 }
 
 export const MathOperators: { [key: string]: Opcode } = {
@@ -24,7 +24,7 @@ export const MathOperators: { [key: string]: Opcode } = {
     "-": Opcode.SUB,
     "*": Opcode.MUL,
     "/": Opcode.DIV,
-    "%": Opcode.DIV,
+    "%": Opcode.MOD,
 }
 
 /**
