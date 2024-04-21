@@ -1,0 +1,238 @@
+{
+	"input_lisp": [
+		"((function factorial (x)",
+		" (if (<= x 1)",
+		"  1",
+		"  (* x (factorial (- x 1)))",
+		" )",
+		")",
+		"(print (factorial (5))))"
+	],
+	"input_stdin": "",
+	"output_stdout": "120",
+	"output_json": {
+		"output": 1,
+		"input": 2,
+		"program": [
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": 2
+				}
+			},
+			{
+				"value": 1
+			},
+			{
+				"value": 2
+			},
+			{
+				"line": 0,
+				"source": "5",
+				"opcode": 23,
+				"arg": 5
+			},
+			{
+				"line": 0,
+				"source": "5",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(factorial (5))",
+				"opcode": 17,
+				"arg": {
+					"addressing": "absolute",
+					"value": 8
+				}
+			},
+			{
+				"line": 0,
+				"source": "arg clear 5",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(print (factorial (5)))",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 22,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 23,
+				"arg": 1
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "x",
+				"opcode": 23,
+				"arg": {
+					"addressing": "stack",
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "(<= x 1)",
+				"opcode": 21,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "(<= x 1)",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(<= x 1)",
+				"opcode": 10,
+				"arg": {
+					"addressing": "relative",
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 23,
+				"arg": 1
+			},
+			{
+				"line": 0,
+				"source": "(if (<= x 1))",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": 12
+				}
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 23,
+				"arg": 1
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "x",
+				"opcode": 23,
+				"arg": {
+					"addressing": "stack",
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "(- x 1)",
+				"opcode": 4,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(- x 1)",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(factorial (- x 1))",
+				"opcode": 17,
+				"arg": {
+					"addressing": "absolute",
+					"value": 8
+				}
+			},
+			{
+				"line": 0,
+				"source": "arg clear - x 1",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(factorial (- x 1))",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "x",
+				"opcode": 23,
+				"arg": {
+					"addressing": "stack",
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "(* x (factorial (- x 1)))",
+				"opcode": 5,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": "stack",
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "ret factorial",
+				"opcode": 18,
+				"arg": 0
+			}
+		]
+	}
+}

@@ -1,0 +1,459 @@
+{
+	"input_lisp": [
+		"(",
+		"    (setq sum 0)",
+		"    (setq i 1)",
+		"    (while (< i 1000)(",
+		"        (if (= (% i 3) 0)",
+		"            (setq sum (+ sum i))",
+		"            (if (= (% i 5) 0)",
+		"                (setq sum (+ sum i))",
+		"                ()",
+		"            )",
+		"        )",
+		"        (setq i (+ i 1))",
+		"    ))",
+		"    (print sum)",
+		")"
+	],
+	"input_stdin": "",
+	"output_stdout": "233168",
+	"output_json": {
+		"output": 1,
+		"input": 2,
+		"program": [
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": 4
+				}
+			},
+			{
+				"value": 1
+			},
+			{
+				"value": 2
+			},
+			{
+				"value": 0
+			},
+			{
+				"value": 0
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(setq sum 0)",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 23,
+				"arg": 1
+			},
+			{
+				"line": 0,
+				"source": "(setq i 1)",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "1000",
+				"opcode": 23,
+				"arg": 1000
+			},
+			{
+				"line": 0,
+				"source": "1000",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(< i 1000)",
+				"opcode": 21,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "(< i 1000)",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(< i 1000)",
+				"opcode": 12,
+				"arg": {
+					"addressing": "relative",
+					"value": 41
+				}
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "3",
+				"opcode": 23,
+				"arg": 3
+			},
+			{
+				"line": 0,
+				"source": "3",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(% i 3)",
+				"opcode": 7,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 3) 0)",
+				"opcode": 21,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 3) 0)",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 3) 0)",
+				"opcode": 16,
+				"arg": {
+					"addressing": "relative",
+					"value": 7
+				}
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "sum",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "(+ sum i)",
+				"opcode": 3,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(setq sum (+ sum i))",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "(if (= (% i 3) 0))",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": 17
+				}
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "5",
+				"opcode": 23,
+				"arg": 5
+			},
+			{
+				"line": 0,
+				"source": "5",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(% i 5)",
+				"opcode": 7,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 5) 0)",
+				"opcode": 21,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 5) 0)",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(= (% i 5) 0)",
+				"opcode": 16,
+				"arg": {
+					"addressing": "relative",
+					"value": 7
+				}
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "sum",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "(+ sum i)",
+				"opcode": 3,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(setq sum (+ sum i))",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "(if (= (% i 5) 0))",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 23,
+				"arg": 1
+			},
+			{
+				"line": 0,
+				"source": "1",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "i",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(+ i 1)",
+				"opcode": 3,
+				"arg": {
+					"addressing": "stack",
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "second math arg clear",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(setq i (+ i 1))",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "while (< i 1000)",
+				"opcode": 14,
+				"arg": {
+					"addressing": "relative",
+					"value": -47
+				}
+			},
+			{
+				"line": 0,
+				"source": "sum",
+				"opcode": 23,
+				"arg": {
+					"addressing": "absolute",
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "(print sum)",
+				"opcode": 24,
+				"arg": {
+					"addressing": "absolute",
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 22,
+				"arg": 0
+			}
+		]
+	}
+}

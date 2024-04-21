@@ -6,7 +6,8 @@
     "build": "npx tsc -p tsconfig.json",
     "translate": "node translator.js",
     "simulate": "node model/processor.js",
-    "dev-translate": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node translator.js prob1.lisp out.lisp\""
+    "dev-translate": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node translator.js prob1.lisp out.lisp\"",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +18,13 @@
   "devDependencies": {
     "@eslint/js": "^8.57.0",
     "@tsconfig/node20": "^20.1.2",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
     "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.6.0"
   }
