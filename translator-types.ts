@@ -1,4 +1,4 @@
-import {Instruction, Opcode} from "./byte-code";
+import {Data, Instruction, Opcode} from "./byte-code";
 
 
 export enum Syntax {
@@ -34,10 +34,19 @@ export const MathOperators: { [key: string]: Opcode } = {
 export interface LexicalEnvironment {
     parent?: LexicalEnvironment;
     variables: string[];
+    // eslint-disable-next-line no-use-before-define
+    functions: FunctionContainer[];
 }
 
 export interface FunctionContainer {
     address: number
     name: string;
     body: Instruction[];
+    lexical_environment: LexicalEnvironment;
+}
+
+export interface SourceProgram {
+    output: number,
+    input: number,
+    program: Array<Instruction | Data>,
 }

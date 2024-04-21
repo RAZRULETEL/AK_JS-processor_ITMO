@@ -1,5 +1,12 @@
 import * as fs from "fs";
-import {ComparisonOperator, FunctionContainer, LexicalEnvironment, MathOperators, Syntax} from "./translator-types";
+import {
+    ComparisonOperator,
+    FunctionContainer,
+    LexicalEnvironment,
+    MathOperators,
+    SourceProgram,
+    Syntax
+} from "./translator-types";
 import {Data, Instruction, Opcode} from "./byte-code";
 
 const CLI_ARGS_COUNT = 4;
@@ -10,44 +17,46 @@ const OUTPUT_ADDRESS = 1;
 const INPUT_ADDRESS = 2;
 
 // Accept two arguments: input file and output file.
-if(process.argv.length !== CLI_ARGS_COUNT) {
-    console.error(`Usage: node ${ process.argv[1] } <input file> <output file>`);
-    process.exit(1);
+if(process.argv.length === CLI_ARGS_COUNT) {
+    const input_file = process.argv[INPUT_FILE_ARG_INDEX];
+    const output_file = process.argv[OUTPUT_FILE_ARG_INDEX];
+
+    translate_file(input_file, output_file);
+}else
+    if(process.argv[1].endsWith("translator.js")) {
+        console.error(`Usage: node ${process.argv[1]} <input file> <output file>`);
+        process.exit(1);
+    }
+
+
+export function translate_file(input_file: string, output_file: string) {
+
+    if(fs.existsSync(input_file)) {
+        const input_data = fs.readFileSync(input_file, 'utf8');
+
+        const program = translate(input_data);
+
+        const output: SourceProgram = {
+            output: OUTPUT_ADDRESS,
+            input: INPUT_ADDRESS,
+            program,
+        };
+
+        fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
+    }else {
+        console.error(`Input file ${ input_file } does not exists!`);
+        process.exit(1);
+    }
 }
-const input_file = process.argv[INPUT_FILE_ARG_INDEX];
-const output_file = process.argv[OUTPUT_FILE_ARG_INDEX];
 
-const mappings: { [key: string]: FunctionContainer } = {}; // functions address mapping
 
-// Read the input file.
-if(fs.existsSync(input_file)) {
-    const input_data = fs.readFileSync(input_file, 'utf8');
-
-    const program = translate(input_data);
-    console.log(program, mappings, Object.values(mappings).flatMap(el => el.body));
-
-    program.push(...Object.values(mappings).flatMap(el => el.body));
-
-    const output = {
-        output: OUTPUT_ADDRESS,
-        input: INPUT_ADDRESS,
-        program,
-    };
-
-    fs.writeFileSync(output_file, JSON.stringify(output), 'utf8');
-    // fs.writeFileSync(output_file, program.map(instr => JSON.stringify(instr)).join(",\n"), 'utf8');
-}else {
-    console.error(`Input file ${ input_file } does not exists!`);
-    process.exit(1);
-}
-
-// Translate the input file.
 function translate(input_data: string): (Instruction | Data)[] {
     const result: Instruction[] = [];
 
     const root: LexicalEnvironment = {
         parent: undefined,
-        variables: []
+        variables: [],
+        functions: [],
     };
 
     try {
@@ -68,6 +77,7 @@ function translate(input_data: string): (Instruction | Data)[] {
     return post_process(result, root);
 }
 
+// eslint-disable-next-line max-lines-per-function
 function post_process(program: Instruction[], lexical_environment: LexicalEnvironment): (Instruction | Data)[]{
     const result: (Instruction | Data)[] = [{
         line: 0,
@@ -86,34 +96,57 @@ function post_process(program: Instruction[], lexical_environment: LexicalEnviro
         arg: 0
     });
 
+    const mappings: {[key: string]: number} = {};
+
     const start = result.length + program.length;
     let offset = 0;
-    for(const func of Object.values(mappings)) {
+    for(const func of lexical_environment.functions) {
         func.address = start + offset;
+        mappings[func.name] = func.address;
         offset += func.body.length;
     }
 
-    for (const instruction of program) {
-        if(typeof instruction.arg === 'object') {
-            if('type' in instruction.arg){
-                const arg = instruction.arg;
-                if(arg.type === 'variable') {
-                    instruction.arg = {
-                        addressing: 'absolute',
-                        value: lexical_environment.variables.indexOf(arg.name) + variables_offset
-                    }
+
+    for (const instruction of program.concat(...lexical_environment.functions.flatMap(el => el.body))) {
+        if(typeof instruction.arg === 'object' && 'type' in instruction.arg) {
+            const arg = instruction.arg;
+            if(arg.type === 'variable') {
+                instruction.arg = {
+                    addressing: 'absolute',
+                    value: lexical_environment.variables.indexOf(arg.name) + variables_offset
                 }
-                if(arg.type === 'function') {
-                    instruction.arg = {
-                        addressing: 'absolute',
-                        value: mappings[arg.name].address
-                    }
+            }
+            if(arg.type === 'function') {
+                instruction.arg = {
+                    addressing: 'absolute',
+                    value: mappings[arg.name] - 1
                 }
             }
         }
     }
-    // TODO: post process functions
-    return result.concat(program, ...Object.values(mappings).flatMap(el => el.body));
+
+    post_process_function_variables(lexical_environment.functions);
+
+    return result.concat(program, ...lexical_environment.functions.flatMap(el => el.body));
+}
+
+function post_process_function_variables(functions: FunctionContainer[]) {
+    for (const func of functions) {
+        let stack_offset = 1; // call pushes return address
+        for (const instruction of func.body) {
+            if (instruction.opcode === Opcode.PUSH)
+                stack_offset++;
+            if (instruction.opcode === Opcode.POP || instruction.opcode === Opcode.FLUSH)
+                stack_offset--;
+            if (typeof instruction.arg === 'object' && 'type' in instruction.arg)
+                if (instruction.arg.type === 'stack') {
+                    instruction.arg = {
+                        addressing: 'stack',
+                        value: func.lexical_environment.variables.reverse().indexOf(instruction.arg.name) + stack_offset
+                    }
+                }
+        }
+    }
 }
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
@@ -135,7 +168,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
             case Syntax.FUNCTION:
                 if (lexical_environment.parent)
                     throw new Error("Nested functions not supported!");
-                parse_function_definition(expression, lexical_environment);
+                lexical_environment.functions.push(parse_function_definition(expression, lexical_environment));
                 break;
             case Syntax.SET:
                 result.push(...parse_setq(input_data, lexical_environment));
@@ -144,7 +177,7 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 result.push(...parse_print(expression, lexical_environment));
                 break;
             default:
-                if (match && mappings[match[0]] !== undefined)
+                if (match && lexical_environment.functions.map(el => el.name).includes(match[0]) !== undefined)
                     result.push(...parse_call_function(match[0], cut_expression(input_data.substring(1 + match[0].length)), lexical_environment));
                 break;
         }
@@ -219,15 +252,23 @@ function expression_to_parts(input_data: string): { action: string, first: strin
 
 
 
-function parse_function_definition(input_data: string, lexical_environment: LexicalEnvironment) {
-    const environment: LexicalEnvironment = {
-        parent: lexical_environment,
-        variables: []
+function parse_function_definition(input_data: string, lexical_environment: LexicalEnvironment): FunctionContainer {
+    const container: FunctionContainer = {
+        address: 0,
+        name: "",
+        body: [],
+        lexical_environment: {
+            parent: lexical_environment,
+            variables: [],
+            functions: []
+        }
     };
 
     let offset = 1 + Syntax.FUNCTION.length + 1
     const name = match_or_throw(input_data.substring(offset), /^\w+/u, "Function must have name!")
     offset += name.length;
+
+    container.name = name;
 
     let args = match_or_throw(input_data.substring(offset), /^\s*(\w+|\([^)]*\))\s*/u,
         "Function must have arguments expression in format '(a b c)' or 'a'!");
@@ -235,27 +276,15 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
     console.log("Define", `${name}|${args}|${input_data.substring(offset)}`);
     args = args.trim();
     if (args.startsWith("("))
-        environment.variables.push(...args.substring(1, args.length - 1).split(" ").filter(el => !!el));
+        container.lexical_environment.variables.push(...args.substring(1, args.length - 1).split(" ").filter(el => !!el));
     else
-        environment.variables.push(args);
+        container.lexical_environment.variables.push(args);
 
-    const body: Instruction[] = [];
+    const body: Instruction[] = container.body;
 
-    mappings[name] = {
-        address: Object.keys(mappings).length,
-        name,
-        body
-    };
-
-    body.push(...parse_function_body(input_data.substring(offset), environment));
-    if(environment.variables.length > 0){
-        body.push(set_value(environment.variables[0], environment));
-        body.push(...environment.variables.reverse().map(variable => ({
-            line: 0,
-            source: `pop function args ${variable}`,
-            opcode: Opcode.POP,
-            arg: 0
-        })));
+    body.push(...parse_function_body(input_data.substring(offset), container.lexical_environment));
+    if(container.lexical_environment.variables.length > 0){
+        body.push(set_value(container.lexical_environment.variables[0], container.lexical_environment));
     }
     body.push({
         line: 0,
@@ -263,6 +292,8 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         opcode: Opcode.RET,
         arg: 0
     });
+
+    return container;
 }
 
 function parse_function_body(input_body: string, lexical_environment: LexicalEnvironment): Instruction[]{
@@ -282,6 +313,7 @@ function parse_function_body(input_body: string, lexical_environment: LexicalEnv
     return body;
 }
 
+// eslint-disable-next-line max-lines-per-function
 function parse_call_function(name: string, args: string, lexical_environment: LexicalEnvironment): Instruction[]{
     const result: Instruction[] = []
 
@@ -294,27 +326,30 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
     else
         throw new Error("Function call must have args expression!");
 
-    if(MathOperators[args[0]]) {
-        result.push(...parse_math(`(${args})`, lexical_environment));
-        result.push({
-            line: 0,
-            source: `push (${args})`,
-            opcode: Opcode.PUSH,
-            arg: 0
-        })
-        return result
-    }
-
-    const variables = args.matchAll(/(\w+|\([^() ]+\))/igu);
-    for(const variable of variables){
-        result.push(load_value(variable[0], lexical_environment));
-        result.push({
-            line: 0,
-            source: `push ${variable[0]}`,
-            opcode: Opcode.PUSH,
-            arg: 0
-        })
-    }
+    let args_count = 0;
+    if(args)
+        if(MathOperators[args[0]]) {
+            result.push(...parse_math(`(${args})`, lexical_environment));
+            result.push({
+                line: 0,
+                source: `(${args})`,
+                opcode: Opcode.PUSH,
+                arg: 0
+            });
+            args_count = 1;
+        }else{
+            const variables = args.matchAll(/(\w+|\([^() ]+\))/igu);
+            for (const variable of variables) {
+                result.push(load_value(variable[0], lexical_environment));
+                result.push({
+                    line: 0,
+                    source: variable[0],
+                    opcode: Opcode.PUSH,
+                    arg: 0
+                });
+                args_count++;
+            }
+        }
 
     result.push({
         line: 0,
@@ -322,6 +357,14 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
         opcode: Opcode.CALL,
         arg: {type: 'function', name}
     })
+
+    for(let index = 0; index < args_count; index++)
+        result.push({
+            line: 0,
+            source: `arg clear ${args}`,
+            opcode: Opcode.POP,
+            arg: 0
+        })
 
     return result;
 }
@@ -436,7 +479,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
 function parse_if(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
 
-    const {first, second, third} = expression_to_parts(input_data);
+    const {action, first, second, third} = expression_to_parts(input_data);
     if(!third)
         throw new Error("If statement always requires else branch");
 
@@ -448,7 +491,7 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
 
     const positive_end_jmp: Instruction = {
         line: 0,
-        source: second,
+        source: `(${action} ${first})`,
         opcode: Opcode.JMP,
         arg: 0
     };
@@ -598,7 +641,7 @@ function set_value(variable: string, lexical_environment: LexicalEnvironment, so
                 line: 0,
                 source,
                 opcode: Opcode.ST,
-                arg: {addressing: 'stack', value: lexical_environment.variables.reverse().indexOf(variable)}
+                arg: {type: 'stack', name: variable}
             }
         else
             return {
