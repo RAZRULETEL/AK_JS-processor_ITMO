@@ -5,7 +5,7 @@ export class MemoryStorage {
     private storage: Array<Instruction | Data> = [];
     private readonly output: number;
     private readonly input: number;
-    private input_buffer: number[];
+    private input_buffer: number[] = [];
 
     constructor(memory_size: number, storage: {program: Array<Instruction | Data>, input: number, output: number}) {
         if (memory_size <= 0)
@@ -22,7 +22,10 @@ export class MemoryStorage {
         if (address < 0 || address >= this.memory_size)
             throw new Error("Invalid address");
         if(address === this.input)
-            return {value: this.input_buffer.shift() || 0};
+            if(this.input_buffer.length > 0)
+                return {value: this.input_buffer.shift() || 0};
+            else
+                throw new Error("Input buffer is empty!");
         return this.storage[address];
     }
 
@@ -31,9 +34,9 @@ export class MemoryStorage {
             throw new Error("Invalid address");
         if(address === this.output)
             if('value' in value)
-                console.info(value.value);
+                process.stdout.write(value.value.toString());
             else
-                console.info(value);
+                process.stdout.write(JSON.stringify(value));
         else
             this.storage[address] = value;
     }
