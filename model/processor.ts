@@ -1,4 +1,3 @@
-import {Data, Instruction, Opcode, Register} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
@@ -7,12 +6,18 @@ import {
     ProcessorState,
     STACK_OPERANDS
 } from "./processor-types";
+import {Opcode, Register} from "../byte-code";
 import {AluOperation} from "./alu";
 import {MemoryStorage} from "./memory";
+import {SourceProgram} from "../translator-types";
 import fs from "fs";
+
 
 export const REGISTER_BITS_SIZE = 32;
 const INPUT_FILE_ARG = 2;
+const STDIN_FILE_ARG = 3;
+const TIME_LIMIT_ARG = 4;
+
 const MEMORY_SIZE = 1024;
 const PROB1_TIME_LIMIT = 1_000_000;
 
@@ -157,7 +162,7 @@ export class Processor {
 
                 this.latch_buffer_register(this.alu_operation(Register.IP));
                 if(instruction.opcode === Opcode.POP){
-                    this.latch_instruction_pointer(this.alu_operation(Register.SP, Register.ZR, Opcode.DEC));
+                    this.latch_instruction_pointer(this.alu_operation(Register.SP));
                 }else
                     this.latch_instruction_pointer(this.fetch_instruction_address());
 
@@ -199,21 +204,21 @@ export class Processor {
             this.tick();
         }
 
-        if(opcode === Opcode.CALL){
-            this.latch_buffer_register(this.alu_operation(Register.IP));
-            this.latch_instruction_pointer(this.alu_operation(Register.SP));
-            this.latch_memory(this.alu_operation(Register.BR));
-            this.latch_instruction_pointer(this.fetch_instruction_address());
-        }
-
         if(opcode === Opcode.RET){
-            this.latch_instruction_pointer(this.alu_operation(Register.SP, 1, Opcode.SUB));
+            this.latch_instruction_pointer(this.alu_operation(Register.SP));
             this.latch_data_register();
             this.latch_instruction_pointer(this.alu_operation(Register.DR));
         }
 
         if(STACK_OPERANDS.includes(opcode))
             this.latch_stack_pointer();
+
+        if(opcode === Opcode.CALL){
+            this.latch_buffer_register(this.alu_operation(Register.IP));
+            this.latch_instruction_pointer(this.alu_operation(Register.SP));
+            this.latch_memory(this.alu_operation(Register.BR));
+            this.latch_instruction_pointer(this.fetch_instruction_address());
+        }
 
         this.state = ProcessorState.WritingData;
     }
@@ -252,7 +257,7 @@ export class Processor {
             else
                 return this.alu_operation(Register.SP, this.registers.PR.arg.value);
         else
-            throw new Error("Call instruction must have Address arg");
+            throw new Error("Instruction must have Address arg");
     }
 
     get_state(): string{
@@ -286,11 +291,22 @@ export class Processor {
 const program_code_file = process.argv[INPUT_FILE_ARG];
 if(program_code_file) {
     if(fs.existsSync(program_code_file)) {
-        const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as
-            { program: Array<Instruction | Data>, input: number, output: number };
-        const memory = new MemoryStorage(MEMORY_SIZE, input_data);
-        const processor = new Processor(memory);
-        processor.start_simulation(PROB1_TIME_LIMIT);
+        if(!process.argv[STDIN_FILE_ARG] || fs.existsSync(process.argv[STDIN_FILE_ARG])) {
+            const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as SourceProgram;
+            const stdin = process.argv[STDIN_FILE_ARG] ? fs.readFileSync(process.argv[STDIN_FILE_ARG], 'utf8') : "";
+            const time_limit = process.argv[TIME_LIMIT_ARG] ? +process.argv[TIME_LIMIT_ARG] : PROB1_TIME_LIMIT
+
+            simulate(input_data, stdin, time_limit);
+        }else
+            console.error(`File ${process.argv[STDIN_FILE_ARG]} does not exists!`);
     }else
         console.error(`File ${program_code_file} does not exists!`);
+
+}
+
+export function simulate(program: SourceProgram, stdin: string, time_limit: number) {
+    const memory = new MemoryStorage(MEMORY_SIZE, program);
+    memory.add_input(...stdin.split("").map(char => char.charCodeAt(0)));
+    const processor = new Processor(memory);
+    processor.start_simulation(time_limit);
 }
