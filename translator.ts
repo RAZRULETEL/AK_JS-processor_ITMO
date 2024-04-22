@@ -3,7 +3,7 @@ import {
     ComparisonOperator,
     FunctionContainer,
     LexicalEnvironment,
-    MathOperators,
+    MathOperators, ProgramTemplate,
     SourceProgram,
     Syntax
 } from "./translator-types";
@@ -30,7 +30,6 @@ if(process.argv.length === CLI_ARGS_COUNT) {
 
 
 export function translate_file(input_file: string, output_file: string) {
-
     if(fs.existsSync(input_file)) {
         const input_data = fs.readFileSync(input_file, 'utf8');
 
@@ -50,13 +49,14 @@ export function translate_file(input_file: string, output_file: string) {
 }
 
 
-function translate(input_data: string): (Instruction | Data)[] {
+function translate(input_data: string): Array<Instruction | Data> {
     const result: Instruction[] = [];
 
     const root: LexicalEnvironment = {
         parent: undefined,
         variables: [],
         functions: [],
+        strings: [],
     };
 
     try {
@@ -77,28 +77,13 @@ function translate(input_data: string): (Instruction | Data)[] {
     return post_process(result, root);
 }
 
-// eslint-disable-next-line max-lines-per-function
-function post_process(program: Instruction[], lexical_environment: LexicalEnvironment): (Instruction | Data)[]{
-    const result: (Instruction | Data)[] = [{
-        line: 0,
-        source: "",
-        opcode: Opcode.JMP,
-        arg: {addressing: 'relative', value: lexical_environment.variables.length + 1 + 1}
-    }, {value: OUTPUT_ADDRESS}, {value: INPUT_ADDRESS}
-        , ...lexical_environment.variables.map(() => ({value: 0}))
-    ];
-    const variables_offset = result.length - lexical_environment.variables.length
-
-    program.push({
-        line: 0,
-        source: "",
-        opcode: Opcode.HALT,
-        arg: 0
-    });
+function post_process(program_body: Instruction[], lexical_environment: LexicalEnvironment): Array<Instruction | Data>{
+    const {program, variables_offset, functions_offset}: ProgramTemplate
+        = create_program_template(program_body, lexical_environment);
 
     const mappings: {[key: string]: number} = {};
 
-    const start = result.length + program.length;
+    const start = functions_offset;
     let offset = 0;
     for(const func of lexical_environment.functions) {
         func.address = start + offset;
@@ -106,8 +91,7 @@ function post_process(program: Instruction[], lexical_environment: LexicalEnviro
         offset += func.body.length;
     }
 
-
-    for (const instruction of program.concat(...lexical_environment.functions.flatMap(el => el.body))) {
+    for (const instruction of program_body.concat(...lexical_environment.functions.flatMap(el => el.body))) {
         if(typeof instruction.arg === 'object' && 'type' in instruction.arg) {
             const arg = instruction.arg;
             if(arg.type === 'variable') {
@@ -127,7 +111,50 @@ function post_process(program: Instruction[], lexical_environment: LexicalEnviro
 
     post_process_function_variables(lexical_environment.functions);
 
-    return result.concat(program, ...lexical_environment.functions.flatMap(el => el.body));
+    return program;
+}
+
+function create_program_template(program: Instruction[], lexical_environment: LexicalEnvironment): ProgramTemplate{
+    const variables = lexical_environment.variables.map(() => ({value: 0}));
+
+    const free_memory: Data = {value: 0};
+
+    const template: ProgramTemplate = {
+        program: [
+            {
+                line: 0,
+                source: "",
+                opcode: Opcode.JMP,
+                arg: {addressing: 'relative', value: lexical_environment.variables.length + 1 + 1}
+            },
+            {value: OUTPUT_ADDRESS},
+            {value: INPUT_ADDRESS},
+            // free_memory
+        ],
+        variables_offset: 0,
+        program_offset: 0,
+        functions_offset: 0
+    }
+
+    template.variables_offset = template.program.length;
+    template.program.push(...variables);
+
+    template.program_offset = template.program.length;
+    template.program.push(
+        ...program,
+        {
+            line: 0,
+            source: "",
+            opcode: Opcode.HALT,
+            arg: 0
+        });
+
+    template.functions_offset = template.program.length;
+    template.program.push(...lexical_environment.functions.flatMap(el => el.body));
+
+    free_memory.value = template.program.length;
+
+    return template
 }
 
 function post_process_function_variables(functions: FunctionContainer[]) {
@@ -148,6 +175,8 @@ function post_process_function_variables(functions: FunctionContainer[]) {
         }
     }
 }
+
+
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     console.log("Parse ", !!lexical_environment.parent, input_data);
@@ -260,7 +289,8 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         lexical_environment: {
             parent: lexical_environment,
             variables: [],
-            functions: []
+            functions: [],
+            strings: []
         }
     };
 

@@ -36,6 +36,7 @@ export interface LexicalEnvironment {
     variables: string[];
     // eslint-disable-next-line no-use-before-define
     functions: FunctionContainer[];
+    strings: string[];
 }
 
 export interface FunctionContainer {
@@ -49,4 +50,11 @@ export interface SourceProgram {
     output: number,
     input: number,
     program: Array<Instruction | Data>,
+}
+
+export interface ProgramTemplate {
+    program: Array<Instruction | Data>,
+    variables_offset: number,
+    program_offset: number,
+    functions_offset: number,
 }

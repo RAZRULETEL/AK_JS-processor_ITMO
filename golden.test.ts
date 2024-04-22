@@ -18,7 +18,7 @@ const TEST_PROCESSOR_TIME_LIMIT = 1_000_000;
 const TRANSLATOR_PATH = "./translator.js";
 const PROCESSOR_PATH = "./model/processor.js";
 
-describe('Runnig golden tests', () => {
+describe('Running golden tests', () => {
     it.each([
         "tests/factorial.json",
         "tests/prob1.json",
