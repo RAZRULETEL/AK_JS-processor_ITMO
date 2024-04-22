@@ -33,18 +33,32 @@ export class AluOperation {
     execute(): number{
         const val1 = this.processor.get_register(this.reg1);
         const val2 = typeof this.reg2 === "number" ? this.reg2 : this.processor.get_register(this.reg2);
-        return OPCODE_MATH_OPERATIONS[this.operation](val1, val2);
+
+        let result = OPCODE_MATH_OPERATIONS[this.operation](val1, val2);
+
+        if(result.toString(RADIX).length >= REGISTER_BITS_SIZE
+            && result.toString(RADIX)[0].substring(0, REGISTER_BITS_SIZE) === '1')
+            result = -(result - RADIX ** REGISTER_BITS_SIZE);
+
+        return result;
     }
 
     get_flags(): Flags {
-        const val = this.execute();
-        const carry = +(val > (RADIX ** REGISTER_BITS_SIZE - 1) || val < -(RADIX ** REGISTER_BITS_SIZE));
-        const overflow = +(val < -(RADIX ** REGISTER_BITS_SIZE) || val > (RADIX ** REGISTER_BITS_SIZE - 1));
+        const val1 = this.processor.get_register(this.reg1);
+        const val2 = typeof this.reg2 === "number" ? this.reg2 : this.processor.get_register(this.reg2);
+
+        const res = this.execute();
+
+        const carry = +(OPCODE_MATH_OPERATIONS[this.operation](val1, val2) > (RADIX ** REGISTER_BITS_SIZE - 1));
+        let overflow = 0;
+
+        if(Math.sign(val1) === Math.sign(val2) && Math.sign(val1) !== Math.sign(res))
+            overflow = 1;
 
         return {
-            Zero: +(!val),
+            Zero: +(!res),
             Carry: carry,
-            Negative: +(val < 0),
+            Negative: +(res < 0),
             Overflow: overflow
         };
     }
