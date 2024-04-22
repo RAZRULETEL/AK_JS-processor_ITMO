@@ -606,7 +606,7 @@ function parse_or_load(input: string, lexical_environment: LexicalEnvironment): 
 }
 
 function load_value(variable: string, lexical_environment: LexicalEnvironment, compare_only: boolean = false): Instruction {
-    if (isNaN(+variable))
+    if (isNaN(+variable) && !variable.startsWith("'"))
         if (!lexical_environment.variables.includes(variable))
             throw new Error(`Variable ${variable} is not defined.`);
         else if (lexical_environment.parent)
@@ -623,13 +623,22 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
                 arg: {type: 'variable', name: variable}
             }
-    else
+    else {
+        let value = +variable;
+        if (variable.startsWith("'")) {
+            if (!variable.endsWith("'"))
+                throw new Error(`Literal not closed: ${variable}`);
+            if (variable.substring(1, variable.length - 1).length !== 1)
+                throw new Error(`Invalid literal length ${variable.length - 1 - 1}, expected 1: ${variable}`);
+            value = variable.charCodeAt(1);
+        }
         return {
             line: 0,
             source: variable,
             opcode: compare_only ? Opcode.CMP : Opcode.LD,
-            arg: +variable
+            arg: value
         }
+    }
 }
 
 function set_value(variable: string, lexical_environment: LexicalEnvironment, source: string = ""): Instruction {

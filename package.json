@@ -6,7 +6,7 @@
     "build": "npx tsc -p tsconfig.json",
     "translate": "node translator.js",
     "simulate": "node model/processor.js",
-    "dev-translate": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node translator.js prob1.lisp out.lisp\"",
+    "dev-translate": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node translator.js programs/hello.lisp out.lisp\"",
     "test": "jest"
   },
   "keywords": [],
