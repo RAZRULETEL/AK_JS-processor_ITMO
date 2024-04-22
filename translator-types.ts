@@ -5,7 +5,6 @@ export enum Syntax {
     IF = "if",
     WHILE = "while",
     FUNCTION = "function",
-    RETURN = "return",
     SET = "setq",
     PRINT = "print",
 }
@@ -27,16 +26,20 @@ export const MathOperators: { [key: string]: Opcode } = {
     "%": Opcode.MOD,
 }
 
+interface Variable {
+    name: string;
+    type: 'int' | 'string';
+}
+
 /**
  * Environment that contains accessible variables and parent environment
  * Have functional visibility - new function => new environment
  */
 export interface LexicalEnvironment {
     parent?: LexicalEnvironment;
-    variables: string[];
-    // eslint-disable-next-line no-use-before-define
+    variables: Variable[];
+    /* eslint-disable-next-line no-use-before-define */// cyclic dependence with FunctionContainer
     functions: FunctionContainer[];
-    strings: string[];
 }
 
 export interface FunctionContainer {

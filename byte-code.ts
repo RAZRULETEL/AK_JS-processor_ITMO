@@ -1,12 +1,12 @@
 /* eslint-disable no-magic-numbers */
 
 export interface Address{
-    addressing: 'stack' | 'relative' | 'absolute';
+    addressing: 'stack' | 'relative' | 'absolute' | 'accumulator';
     value: number;
 }
 
 export interface TargetAddress{
-    type: 'variable' | 'function' | 'stack';
+    type: 'variable' | 'function' | 'stack' | 'string';
     name: string;
 }
 

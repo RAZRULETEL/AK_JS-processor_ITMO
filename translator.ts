@@ -1,13 +1,14 @@
 import * as fs from "fs";
+import {Address, Data, Instruction, Opcode, TargetAddress} from "./byte-code";
 import {
     ComparisonOperator,
     FunctionContainer,
     LexicalEnvironment,
-    MathOperators, ProgramTemplate,
+    MathOperators,
+    ProgramTemplate,
     SourceProgram,
     Syntax
 } from "./translator-types";
-import {Data, Instruction, Opcode} from "./byte-code";
 
 const CLI_ARGS_COUNT = 4;
 const INPUT_FILE_ARG_INDEX = 2;
@@ -22,7 +23,7 @@ if(process.argv.length === CLI_ARGS_COUNT) {
     const output_file = process.argv[OUTPUT_FILE_ARG_INDEX];
 
     translate_file(input_file, output_file);
-}else
+} else
     if(process.argv[1].endsWith("translator.js")) {
         console.error(`Usage: node ${process.argv[1]} <input file> <output file>`);
         process.exit(1);
@@ -34,6 +35,8 @@ export function translate_file(input_file: string, output_file: string) {
         const input_data = fs.readFileSync(input_file, 'utf8');
 
         const program = translate(input_data);
+
+        console.log(program);
 
         const output: SourceProgram = {
             output: OUTPUT_ADDRESS,
@@ -55,8 +58,7 @@ function translate(input_data: string): Array<Instruction | Data> {
     const root: LexicalEnvironment = {
         parent: undefined,
         variables: [],
-        functions: [],
-        strings: [],
+        functions: []
     };
 
     try {
@@ -97,7 +99,7 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
             if(arg.type === 'variable') {
                 instruction.arg = {
                     addressing: 'absolute',
-                    value: lexical_environment.variables.indexOf(arg.name) + variables_offset
+                    value: lexical_environment.variables.findIndex(el => el.name === arg.name) + variables_offset
                 }
             }
             if(arg.type === 'function') {
@@ -114,6 +116,7 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
     return program;
 }
 
+// eslint-disable-next-line max-lines-per-function
 function create_program_template(program: Instruction[], lexical_environment: LexicalEnvironment): ProgramTemplate{
     const variables = lexical_environment.variables.map(() => ({value: 0}));
 
@@ -129,7 +132,7 @@ function create_program_template(program: Instruction[], lexical_environment: Le
             },
             {value: OUTPUT_ADDRESS},
             {value: INPUT_ADDRESS},
-            // free_memory
+            free_memory
         ],
         variables_offset: 0,
         program_offset: 0,
@@ -152,6 +155,19 @@ function create_program_template(program: Instruction[], lexical_environment: Le
     template.functions_offset = template.program.length;
     template.program.push(...lexical_environment.functions.flatMap(el => el.body));
 
+    const strings: {[name: string]: number} = {};
+    for (const instruction of program){
+        if(typeof instruction.arg === 'object' && 'type' in instruction.arg)
+            if (instruction.arg.type === 'string') {
+                if(strings[instruction.arg.name] === undefined) {
+                    strings[instruction.arg.name] = template.program.length;
+                    template.program.push({value: instruction.arg.name.length});
+                    template.program.push(...instruction.arg.name.split("").map(el => ({value: el.charCodeAt(0)})));
+                }
+                instruction.arg = strings[instruction.arg.name];
+            }
+    }
+
     free_memory.value = template.program.length;
 
     return template
@@ -169,7 +185,7 @@ function post_process_function_variables(functions: FunctionContainer[]) {
                 if (instruction.arg.type === 'stack') {
                     instruction.arg = {
                         addressing: 'stack',
-                        value: func.lexical_environment.variables.reverse().indexOf(instruction.arg.name) + stack_offset
+                        value: get_variable_index(instruction.arg.name, func.lexical_environment, true) + stack_offset
                     }
                 }
         }
@@ -280,7 +296,6 @@ function expression_to_parts(input_data: string): { action: string, first: strin
 }
 
 
-
 function parse_function_definition(input_data: string, lexical_environment: LexicalEnvironment): FunctionContainer {
     const container: FunctionContainer = {
         address: 0,
@@ -289,8 +304,7 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
         lexical_environment: {
             parent: lexical_environment,
             variables: [],
-            functions: [],
-            strings: []
+            functions: []
         }
     };
 
@@ -306,15 +320,19 @@ function parse_function_definition(input_data: string, lexical_environment: Lexi
     console.log("Define", `${name}|${args}|${input_data.substring(offset)}`);
     args = args.trim();
     if (args.startsWith("("))
-        container.lexical_environment.variables.push(...args.substring(1, args.length - 1).split(" ").filter(el => !!el));
+        container.lexical_environment.variables
+            .push(...args.substring(1, args.length - 1)
+                .split(" ")
+                .filter(el => !!el)
+                .map(el => ({name: el, type: 'int' as 'string' | 'int' })));
     else
-        container.lexical_environment.variables.push(args);
+        container.lexical_environment.variables.push({name: args, type: 'int'});
 
     const body: Instruction[] = container.body;
 
     body.push(...parse_function_body(input_data.substring(offset), container.lexical_environment));
     if(container.lexical_environment.variables.length > 0){
-        body.push(set_value(container.lexical_environment.variables[0], container.lexical_environment));
+        body.push(set_value(container.lexical_environment.variables[0].name, container.lexical_environment));
     }
     body.push({
         line: 0,
@@ -561,16 +579,20 @@ function parse_setq(input: string, lexical_environment: LexicalEnvironment): Ins
     const result: Instruction[] = [];
 
     const {first, second} = expression_to_parts(input);
-    if(!first.match(/^\w(\w|\d)*$/ui))
+    if (!first.match(/^\w(\w|\d)*$/ui))
         throw new Error(`Invalid variable name: ${first}`);
 
-    if(second.startsWith("("))
+    if (second.startsWith("("))
         result.push(...parse(second, lexical_environment));
     else
         result.push(load_value(second, lexical_environment));
 
-    if(!lexical_environment.variables.includes(first))
-        lexical_environment.variables.push(first)
+    if (get_variable_index(first, lexical_environment) < 0)
+        if (second.startsWith('"'))
+            lexical_environment.variables.push({name: first, type: 'string'});
+        else
+            lexical_environment.variables.push({name: first, type: 'int'});
+
 
     result.push(set_value(first, lexical_environment, input));
     return result;
@@ -616,17 +638,60 @@ function parse_print(input: string, lexical_environment: LexicalEnvironment): In
     if(first.startsWith("(")){
         const expression = cut_expression(first);
         result.push(...parse(expression, lexical_environment));
-    }else
-        result.push(load_value(first, lexical_environment));
-
-    result.push({
-        line: 0,
-        source: input,
-        opcode: Opcode.ST,
-        arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
-    });
+    }else if (get_value_type(first, lexical_environment) === 'int')
+        result.push(load_value(first, lexical_environment),
+            {
+                line: 0,
+                source: input,
+                opcode: Opcode.ST,
+                arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
+            });
+    else {
+        result.push(load_value(first, lexical_environment));// Loads address of string
+        result.push(...print_string(first));
+    }
 
     return result
+}
+
+function print_string(source: string): Instruction[]{
+    const result: Instruction[] = [];
+    const push = create_instruction(Opcode.PUSH);
+    const pop = create_instruction(Opcode.POP);
+    const ld_address: Instruction = create_instruction(Opcode.LD, {addressing: 'stack', value: 1});
+    const st_address: Instruction = create_instruction(Opcode.ST, {addressing: 'stack', value: 1});
+    const ld_length = create_instruction(Opcode.LD, {addressing: 'stack', value: 0});
+    const st_length = create_instruction(Opcode.ST, {addressing: 'stack', value: 0});
+    const increment = create_instruction(Opcode.INC);
+    const decrement = create_instruction(Opcode.DEC);
+    const ld_char = create_instruction(Opcode.LD, {addressing: 'accumulator', value: 0});
+    result.push(
+        push,
+        ld_char,
+        push,
+        ld_address,
+        increment,
+        st_address,
+        ld_char,
+        create_instruction(Opcode.ST, {addressing: 'absolute', value: OUTPUT_ADDRESS}),
+        ld_length,
+        decrement,
+        st_length,
+        create_instruction(Opcode.JNZ, {addressing: 'relative', value: -9}),
+        pop,
+        pop
+    );
+    
+    
+    return result;
+    function create_instruction(opcode: Opcode, arg: number | TargetAddress | Address = 0): Instruction{
+        return {
+            line: 0,
+            source,
+            opcode,
+            arg
+        }
+    }
 }
 
 function parse_or_load(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
@@ -637,7 +702,17 @@ function parse_or_load(input: string, lexical_environment: LexicalEnvironment): 
 
 function load_value(variable: string, lexical_environment: LexicalEnvironment, compare_only: boolean = false): Instruction {
     if (isNaN(+variable) && !variable.startsWith("'"))
-        if (!lexical_environment.variables.includes(variable))
+        if (variable.startsWith('"')){
+            if (!variable.endsWith('"'))
+                throw new Error(`String not closed: ${variable}`);
+            return {
+                line: 0,
+                source: variable,
+                opcode: compare_only ? Opcode.CMP : Opcode.LD,
+                arg: {type: 'string', name: variable}
+            }
+        }
+        else if (get_variable_index(variable, lexical_environment) < 0)
             throw new Error(`Variable ${variable} is not defined.`);
         else if (lexical_environment.parent)
             return {
@@ -673,7 +748,7 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
 
 function set_value(variable: string, lexical_environment: LexicalEnvironment, source: string = ""): Instruction {
     if (isNaN(+variable))
-        if (!lexical_environment.variables.includes(variable))
+        if (get_variable_index(variable, lexical_environment) < 0)
             throw new Error(`Variable ${variable} is not defined.`);
         else if (lexical_environment.parent)
             return {
@@ -693,10 +768,26 @@ function set_value(variable: string, lexical_environment: LexicalEnvironment, so
         throw new Error(`Variable must be string: ${variable}`);
 }
 
+function get_value_type(variable: string, lexical_environment: LexicalEnvironment): 'int' | 'string' {
+    if (isNaN(+variable))
+        if(variable.startsWith('"'))
+            return 'string'
+        else if (get_variable_index(variable, lexical_environment) < 0)
+            throw new Error(`Variable ${variable} is not defined.`);
+        else
+            return lexical_environment.variables[get_variable_index(variable, lexical_environment)].type;
+    else
+        return 'int';
+}
 
 function match_or_throw(text: string, regexp: RegExp, message?: string){
     const match = text.match(regexp);
     if(match)
         return match[0];
     throw new Error(message);
+}
+
+function get_variable_index(variable: string, lexical_environment: LexicalEnvironment, reverse: boolean = false): number{
+    const vars = lexical_environment.variables;
+    return (reverse ? vars.reverse() : vars).findIndex(el => el.name === variable);
 }

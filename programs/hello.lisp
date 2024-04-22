@@ -1,7 +1,4 @@
 (
-    (setq x 'x')
-    (if (= x 'x')
-        (print x)
-        ()
-    )
+    (setq x "xyz")
+    (print "xyz")
 )
