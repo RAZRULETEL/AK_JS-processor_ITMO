@@ -1,3 +1,4 @@
+import {Addressing, Opcode, Register, data_to_instruction} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
@@ -6,7 +7,6 @@ import {
     ProcessorState,
     STACK_OPERANDS
 } from "./processor-types";
-import {Opcode, Register} from "../byte-code";
 import {AluOperation} from "./alu";
 import {MemoryStorage} from "./memory";
 import {SourceProgram} from "../translator-types";
@@ -59,8 +59,10 @@ export class Processor {
     }
 
     get_register(register: Register): number {
-        if(register === Register.DR && "value" in this.registers.DR) return this.registers.DR.value;
-        return <number>this.registers[register];
+        if(register === Register.DR
+            && this.registers.DR
+            && "value" in this.registers.DR) return this.registers.DR.value;
+        return +<number>this.registers[register];
     }
 
     private alu_operation = AluOperation.alu_operation_fabric(this);
@@ -81,12 +83,12 @@ export class Processor {
             && JMP_CHECK_CONDITION[instruction.opcode](this.flags))
             || (instruction.opcode === Opcode.JMP && this.registers.ZR === 0))
         ) {
-                if (instruction.arg.addressing === "relative")
+                if (instruction.arg.addressing === Addressing.Relative)
                     this.registers.IP += instruction.arg.value;
-                else if (instruction.arg.addressing === "absolute")
+                else if (instruction.arg.addressing === Addressing.Absolute)
                     this.registers.IP = instruction.arg.value;
                 else
-                    throw new Error(`Invalid addressing fot jmp: ${instruction.arg.addressing}`);
+                    throw new Error(`Invalid addressing for jmp: ${instruction.arg.addressing}`);
         }
         this.tick();
     }
@@ -139,7 +141,7 @@ export class Processor {
         if("opcode" in instruction)
             this.registers.PR = instruction;
         else
-            throw new Error("Not implemented!"); // TODO: implement data conversion
+            this.registers.PR = data_to_instruction(instruction);
         this.tick();
     }
 
@@ -250,12 +252,14 @@ export class Processor {
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
         if((typeof this.registers.PR.arg === 'object') && "addressing" in this.registers.PR.arg)
-            if(this.registers.PR.arg.addressing === "relative")
+            if(this.registers.PR.arg.addressing === Addressing.Relative)
                 return this.alu_operation(Register.BR, this.registers.PR.arg.value);
-            else if(this.registers.PR.arg.addressing === "absolute")
+            else if(this.registers.PR.arg.addressing === Addressing.Absolute)
                 return this.alu_operation(Register.ZR, this.registers.PR.arg.value);
-            else
+            else if(this.registers.PR.arg.addressing === Addressing.Stack)
                 return this.alu_operation(Register.SP, this.registers.PR.arg.value);
+            else
+                return this.alu_operation(Register.ACC, this.registers.PR.arg.value);
         else
             throw new Error("Instruction must have Address arg");
     }

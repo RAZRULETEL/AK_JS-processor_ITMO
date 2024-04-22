@@ -34,7 +34,7 @@ export class MemoryStorage {
             throw new Error("Invalid address");
         if(address === this.output)
             if('value' in value)
-                process.stdout.write(value.value.toString());
+                process.stdout.write(String.fromCharCode(value.value));
             else
                 process.stdout.write(JSON.stringify(value));
         else

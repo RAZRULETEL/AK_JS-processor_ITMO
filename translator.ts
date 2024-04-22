@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {Address, Data, Instruction, Opcode, TargetAddress} from "./byte-code";
+import {Address, Addressing, Data, Instruction, Opcode, TargetAddress} from "./byte-code";
 import {
     ComparisonOperator,
     FunctionContainer,
@@ -98,13 +98,13 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
             const arg = instruction.arg;
             if(arg.type === 'variable') {
                 instruction.arg = {
-                    addressing: 'absolute',
+                    addressing: Addressing.Absolute,
                     value: lexical_environment.variables.findIndex(el => el.name === arg.name) + variables_offset
                 }
             }
             if(arg.type === 'function') {
                 instruction.arg = {
-                    addressing: 'absolute',
+                    addressing: Addressing.Absolute,
                     value: mappings[arg.name] - 1
                 }
             }
@@ -128,7 +128,7 @@ function create_program_template(program: Instruction[], lexical_environment: Le
                 line: 0,
                 source: "",
                 opcode: Opcode.JMP,
-                arg: {addressing: 'relative', value: lexical_environment.variables.length + 1 + 1}
+                arg: {addressing: Addressing.Relative, value: lexical_environment.variables.length + 1 + 1}
             },
             {value: OUTPUT_ADDRESS},
             {value: INPUT_ADDRESS},
@@ -184,7 +184,7 @@ function post_process_function_variables(functions: FunctionContainer[]) {
             if (typeof instruction.arg === 'object' && 'type' in instruction.arg)
                 if (instruction.arg.type === 'stack') {
                     instruction.arg = {
-                        addressing: 'stack',
+                        addressing: Addressing.Stack,
                         value: get_variable_index(instruction.arg.name, func.lexical_environment, true) + stack_offset
                     }
                 }
@@ -439,7 +439,7 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
         line: 0,
         source: input,
         opcode: MathOperators[action],
-        arg: {addressing: 'stack', value: 0}
+        arg: {addressing: Addressing.Stack, value: 0}
     },{
         line: 0,
         source: `second math arg clear`,
@@ -481,7 +481,7 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
             line: 0,
             source: input,
             opcode: Opcode.CMP,
-            arg: {addressing: 'stack', value: 0}
+            arg: {addressing: Addressing.Stack, value: 0}
         },{
             line: 0,
             source: input,
@@ -545,12 +545,12 @@ function parse_if(input_data: string, lexical_environment: LexicalEnvironment): 
     };
     result.push(positive_end_jmp);
     if(jmp)
-        condition_code[jmp].arg = {addressing: "relative", value: positive_branch.length + 1};
+        condition_code[jmp].arg = {addressing: Addressing.Relative, value: positive_branch.length + 1};
 
     const negative_branch = parse_code_branch(third);
     result.push(...negative_branch);
 
-    positive_end_jmp.arg = {addressing: "relative", value: negative_branch.length};
+    positive_end_jmp.arg = {addressing: Addressing.Relative, value: negative_branch.length};
 
     return result;
 
@@ -618,13 +618,13 @@ function parse_while(input: string, lexical_environment: LexicalEnvironment): In
         body.push(...parse(second, lexical_environment));
 
     if(jmp)
-        condition[jmp].arg = {addressing: "relative", value: body.length + 1};
+        condition[jmp].arg = {addressing: Addressing.Relative, value: body.length + 1};
 
     result.push(...body, {
         line: 0,
         source: `${action} ${first}`,
         opcode: Opcode.JMP,
-        arg: {addressing: "relative", value: -body.length - 1 - condition.length}
+        arg: {addressing: Addressing.Relative, value: -body.length - 1 - condition.length}
     });
 
     return result
@@ -644,7 +644,7 @@ function parse_print(input: string, lexical_environment: LexicalEnvironment): In
                 line: 0,
                 source: input,
                 opcode: Opcode.ST,
-                arg: {addressing: 'absolute', value: OUTPUT_ADDRESS}
+                arg: {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}
             });
     else {
         result.push(load_value(first, lexical_environment));// Loads address of string
@@ -658,13 +658,13 @@ function print_string(source: string): Instruction[]{
     const result: Instruction[] = [];
     const push = create_instruction(Opcode.PUSH);
     const pop = create_instruction(Opcode.POP);
-    const ld_address: Instruction = create_instruction(Opcode.LD, {addressing: 'stack', value: 1});
-    const st_address: Instruction = create_instruction(Opcode.ST, {addressing: 'stack', value: 1});
-    const ld_length = create_instruction(Opcode.LD, {addressing: 'stack', value: 0});
-    const st_length = create_instruction(Opcode.ST, {addressing: 'stack', value: 0});
+    const ld_address: Instruction = create_instruction(Opcode.LD, {addressing: Addressing.Stack, value: 1});
+    const st_address: Instruction = create_instruction(Opcode.ST, {addressing: Addressing.Stack, value: 1});
+    const ld_length = create_instruction(Opcode.LD, {addressing: Addressing.Stack, value: 0});
+    const st_length = create_instruction(Opcode.ST, {addressing: Addressing.Stack, value: 0});
     const increment = create_instruction(Opcode.INC);
     const decrement = create_instruction(Opcode.DEC);
-    const ld_char = create_instruction(Opcode.LD, {addressing: 'accumulator', value: 0});
+    const ld_char = create_instruction(Opcode.LD, {addressing: Addressing.Accumulator, value: 0});
     result.push(
         push,
         ld_char,
@@ -673,11 +673,11 @@ function print_string(source: string): Instruction[]{
         increment,
         st_address,
         ld_char,
-        create_instruction(Opcode.ST, {addressing: 'absolute', value: OUTPUT_ADDRESS}),
+        create_instruction(Opcode.ST, {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}),
         ld_length,
         decrement,
         st_length,
-        create_instruction(Opcode.JNZ, {addressing: 'relative', value: -9}),
+        create_instruction(Opcode.GE, {addressing: Addressing.Relative, value: -9}),
         pop,
         pop
     );
@@ -709,7 +709,7 @@ function load_value(variable: string, lexical_environment: LexicalEnvironment, c
                 line: 0,
                 source: variable,
                 opcode: compare_only ? Opcode.CMP : Opcode.LD,
-                arg: {type: 'string', name: variable}
+                arg: {type: 'string', name: variable.substring(1, variable.length-1)}
             }
         }
         else if (get_variable_index(variable, lexical_environment) < 0)
