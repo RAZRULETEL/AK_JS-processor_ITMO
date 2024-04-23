@@ -51,7 +51,6 @@ export function translate_file(input_file: string, output_file: string) {
     }
 }
 
-
 function translate(input_data: string): Array<Instruction | Data> {
     const result: Instruction[] = [];
 
@@ -222,6 +221,17 @@ function parse(input_data: string, lexical_environment: LexicalEnvironment): Ins
                 break;
             case Syntax.PRINT:
                 result.push(...parse_print(expression, lexical_environment));
+                break;
+            case Syntax.PRINT_CHAR:
+                result.push(...parse_or_load(input_data.split(" ")[1].slice(0, -1), lexical_environment), {
+                    line: 0,
+                    source: "",
+                    opcode: Opcode.ST,
+                    arg: {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}
+                })
+                break;
+            case Syntax.INPUT:
+                result.push(...parse_input(expression, lexical_environment));
                 break;
             default:
                 if (match && lexical_environment.functions.map(el => el.name).includes(match[0]) !== undefined)
@@ -725,6 +735,30 @@ function print_int(source: string): Instruction[]{
             arg
         }
     }
+}
+
+
+/**
+ * Reads char from stdin and writes it to variable
+ * @param input_data full expression of input in next form: (input <variable>)
+ * @param lexical_environment environment to get variable from
+ */
+function parse_input(input_data: string, lexical_environment: LexicalEnvironment): Instruction[]{
+    const result: Instruction[] = [];
+
+    const {first} = expression_to_parts(input_data);
+
+    const variable = match_or_throw(first, /^\w+$/u, "You must specify variable name for input!")
+
+    console.log(variable);
+
+    result.push({
+        line: 0,
+        source: input_data,
+        opcode: Opcode.LD,
+        arg: {addressing: Addressing.Absolute, value: INPUT_ADDRESS}
+    }, set_value(variable, lexical_environment, input_data));
+    return result;
 }
 
 function parse_or_load(input: string, lexical_environment: LexicalEnvironment): Instruction[] {

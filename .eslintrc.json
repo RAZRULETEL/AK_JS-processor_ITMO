@@ -18,7 +18,7 @@
 	},
 	"plugins": ["@typescript-eslint"],
 	"rules": {
-		"no-magic-numbers": ["error", {"ignore":  [0, 1]}],
+		"no-magic-numbers": ["error", {"ignore":  [-1, 0, 1]}],
 		"max-statements": ["error", 25, { "ignoreTopLevelFunctions": true }],
 		"no-use-before-define": ["error", {
 			"functions": false,
@@ -31,7 +31,6 @@
 			"allowNumber": true
 		}],
 		"no-warning-comments": "warn",
-		"no-negated-condition": "warn",
 
 		"@typescript-eslint/no-unsafe-enum-comparison": "off", // Breaks switch/case
 		"@typescript-eslint/no-unnecessary-condition": "off", // Stupid, thinks null is true
@@ -39,7 +38,7 @@
 		"func-style": "off",
 		"prefer-destructuring": "off",
 
-		"camelcase": "off",
+		"camelcase": "off", // Different style used
 		"sort-keys": "off",
 		"prefer-named-capture-group": "off",
 
@@ -55,11 +54,11 @@
 		"no-implicit-coercion": "off", // Always creating objects instead of primitives seems like an overhead
 		"no-undefined": "off", // Assigning value to undefined restricted by other rules, needed for comparison
 		"no-plusplus": "off", // WTF ?
-		"no-console": "off",
+		"no-console": "off", // Not a browser, so it's ok
 		"no-ternary": "off", // WTF ?
 		"no-continue": "off", // WTF ?
 		"no-shadow": "off",
-		"no-bitwise": "off",
+		"no-bitwise": "off", // Restrict bitwise operations
 
 		"max-lines": "off"
 	}

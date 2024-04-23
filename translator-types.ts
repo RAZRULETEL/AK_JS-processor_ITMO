@@ -7,6 +7,8 @@ export enum Syntax {
     FUNCTION = "function",
     SET = "setq",
     PRINT = "print",
+    PRINT_CHAR = "printc", // Doesn't convert value to ASCII
+    INPUT = "input",
 }
 
 export const ComparisonOperator: { [key: string]: Opcode } = {
