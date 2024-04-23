@@ -1,4 +1,3 @@
 (
-    (setq x "xyz")
-    (print "xyz")
+    (print "Hello, world!")
 )

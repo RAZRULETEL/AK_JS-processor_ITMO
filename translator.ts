@@ -120,16 +120,17 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
 function create_program_template(program: Instruction[], lexical_environment: LexicalEnvironment): ProgramTemplate{
     const variables = lexical_environment.variables.map(() => ({value: 0}));
 
+    const start_jmp = {
+        line: 0,
+        source: "",
+        opcode: Opcode.JMP,
+        arg: {addressing: Addressing.Relative, value: 0}
+    };
     const free_memory: Data = {value: 0};
 
     const template: ProgramTemplate = {
         program: [
-            {
-                line: 0,
-                source: "",
-                opcode: Opcode.JMP,
-                arg: {addressing: Addressing.Relative, value: lexical_environment.variables.length + 1 + 1}
-            },
+            start_jmp,
             {value: OUTPUT_ADDRESS},
             {value: INPUT_ADDRESS},
             free_memory
@@ -143,6 +144,7 @@ function create_program_template(program: Instruction[], lexical_environment: Le
     template.program.push(...variables);
 
     template.program_offset = template.program.length;
+    start_jmp.arg.value = template.program_offset - 1;
     template.program.push(
         ...program,
         {
@@ -275,8 +277,14 @@ function expression_to_parts(input_data: string): { action: string, first: strin
     let first_expression = input_data.substring(action.length + 1);
     if (first_expression.startsWith("("))
         first_expression = cut_expression(first_expression);
-    else
-        first_expression = input_data.split(" ")[1];
+    else {
+        const match = first_expression.match(/^([^" ]+|"[^"]+")/u);
+        if(match)
+            first_expression = match[0];
+        else
+            first_expression = first_expression.split(" ")[1];
+    }
+
 
     let second_expression = input_data.substring(action.length + 1 + first_expression.length).trim();
     if (second_expression.startsWith("("))
@@ -637,18 +645,12 @@ function parse_print(input: string, lexical_environment: LexicalEnvironment): In
 
     if(first.startsWith("(")){
         const expression = cut_expression(first);
-        result.push(...parse(expression, lexical_environment));
+        result.push(...parse(expression, lexical_environment), ...print_int(input));
     }else if (get_value_type(first, lexical_environment) === 'int')
-        result.push(load_value(first, lexical_environment),
-            {
-                line: 0,
-                source: input,
-                opcode: Opcode.ST,
-                arg: {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}
-            });
+        result.push(load_value(first, lexical_environment), ...print_int(input));
     else {
         result.push(load_value(first, lexical_environment));// Loads address of string
-        result.push(...print_string(first));
+        result.push(...print_string(input));
     }
 
     return result
@@ -684,6 +686,37 @@ function print_string(source: string): Instruction[]{
     
     
     return result;
+    function create_instruction(opcode: Opcode, arg: number | TargetAddress | Address = 0): Instruction{
+        return {
+            line: 0,
+            source,
+            opcode,
+            arg
+        }
+    }
+}
+
+function print_int(source: string): Instruction[]{
+    const FROM_RADIX = 10;
+    const TO_ASCII = 48;
+    return [
+        create_instruction(Opcode.PUSH),
+        create_instruction(Opcode.LD, 0),
+        create_instruction(Opcode.SWAP),
+
+        create_instruction(Opcode.PUSH),
+        create_instruction(Opcode.MOD, FROM_RADIX),
+        create_instruction(Opcode.ADD, TO_ASCII),
+        create_instruction(Opcode.SWAP),
+        create_instruction(Opcode.DIV, FROM_RADIX),
+        create_instruction(Opcode.JNZ, {addressing: Addressing.Relative, value: -6}),
+
+        create_instruction(Opcode.ADD, TO_ASCII),
+        create_instruction(Opcode.ST, {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}),
+        create_instruction(Opcode.POP),
+        create_instruction(Opcode.CMP, 0),
+        create_instruction(Opcode.JNZ, {addressing: Addressing.Relative, value: -4}),
+    ];
     function create_instruction(opcode: Opcode, arg: number | TargetAddress | Address = 0): Instruction{
         return {
             line: 0,
