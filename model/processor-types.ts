@@ -40,7 +40,7 @@ export const JMP_CHECK_CONDITION: {[key: number]: (value: Flags) => boolean} = {
 export const OPERANDS_REQUIRES_DATA_FETCH: Opcode[] = [
     Opcode.POP, Opcode.CMP, Opcode.LD,
     Opcode.ADD, Opcode.SUB, Opcode.MUL,
-    Opcode.DIV, Opcode.MOD
+    Opcode.DIV, Opcode.MOD, Opcode.SWAP
 ];
 
 export const STACK_OPERANDS: Opcode[] = [

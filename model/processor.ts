@@ -160,10 +160,10 @@ export class Processor {
             throw new Error("Processor have no instruction fetched");
         if(OPERANDS_REQUIRES_DATA_FETCH.includes(this.registers.PR.opcode)) {
             const instruction = this.registers.PR;
-            if (instruction.opcode === Opcode.POP || typeof instruction.arg === 'object') {
+            if (instruction.opcode === Opcode.SWAP ||instruction.opcode === Opcode.POP || typeof instruction.arg === 'object') {
 
                 this.latch_buffer_register(this.alu_operation(Register.IP));
-                if(instruction.opcode === Opcode.POP){
+                if(instruction.opcode === Opcode.SWAP || instruction.opcode === Opcode.POP){
                     this.latch_instruction_pointer(this.alu_operation(Register.SP));
                 }else
                     this.latch_instruction_pointer(this.fetch_instruction_address());
@@ -192,7 +192,7 @@ export class Processor {
             return;
         }
 
-        if(![Opcode.CMP, Opcode.LD, Opcode.POP].includes(opcode) && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
+        if(![Opcode.CMP, Opcode.LD, Opcode.POP, Opcode.SWAP].includes(opcode) && OPERANDS_REQUIRES_DATA_FETCH.includes(opcode))
             this.latch_accumulator(this.alu_operation(Register.ACC, Register.BR, opcode), true);
 
         if(opcode === Opcode.LD || opcode === Opcode.POP)
@@ -231,11 +231,13 @@ export class Processor {
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
 
-        if(this.registers.PR.opcode === Opcode.PUSH){
+        if(this.registers.PR.opcode === Opcode.PUSH || this.registers.PR.opcode === Opcode.SWAP){
             this.latch_buffer_register(this.alu_operation(Register.IP));
             this.latch_instruction_pointer(this.alu_operation(Register.SP));
             this.latch_memory(this.alu_operation(Register.ACC));
             this.latch_instruction_pointer(this.alu_operation(Register.BR));
+            if(this.registers.PR.opcode === Opcode.SWAP)
+                this.latch_accumulator(this.alu_operation(Register.DR));
         }
 
         if(this.registers.PR.opcode === Opcode.ST){

@@ -3,7 +3,6 @@
 export enum Addressing {// Zero reserved for direct load
     Relative = 1,
     Absolute = 2,
-
     Stack = 3,
     Accumulator = 4,
 }
@@ -55,7 +54,8 @@ export enum Opcode {
     HALT = 22,
     LD = 23,
     ST = 24,
-    FLUSH = 25, // increment SP
+    FLUSH = 25, // increment SP,
+    SWAP = 26, // ACC <=> mem[SP]
 }
 
 export interface Instruction {

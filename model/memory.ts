@@ -20,7 +20,7 @@ export class MemoryStorage {
 
     get(address: number): Instruction | Data {
         if (address < 0 || address >= this.memory_size)
-            throw new Error("Invalid address");
+            throw new Error(`Invalid address: ${address}`);
         if(address === this.input)
             if(this.input_buffer.length > 0)
                 return {value: this.input_buffer.shift() || 0};
@@ -31,7 +31,7 @@ export class MemoryStorage {
 
     set(address: number, value: Instruction | Data) {
         if (address < 0 || address >= this.memory_size)
-            throw new Error("Invalid address");
+            throw new Error(`Invalid address: ${address}`);
         if(address === this.output)
             if('value' in value)
                 process.stdout.write(String.fromCharCode(value.value));
