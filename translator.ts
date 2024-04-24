@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {Address, Addressing, Data, Instruction, Opcode, TargetAddress} from "./byte-code";
+import {Addressing, Data, Instruction, Opcode} from "./byte-code";
 import {
     ComparisonOperator,
     FunctionContainer,
@@ -9,13 +9,14 @@ import {
     SourceProgram,
     Syntax
 } from "./translator-types";
+import {DefaultLibrary, STANDARD_FUNCTIONS} from "./translator-funcs";
 
 const CLI_ARGS_COUNT = 4;
 const INPUT_FILE_ARG_INDEX = 2;
 const OUTPUT_FILE_ARG_INDEX = 3;
 
-const OUTPUT_ADDRESS = 1;
-const INPUT_ADDRESS = 2;
+export const OUTPUT_ADDRESS = 1;
+export const INPUT_ADDRESS = 2;
 
 // Accept two arguments: input file and output file.
 if(process.argv.length === CLI_ARGS_COUNT) {
@@ -79,6 +80,7 @@ function translate(input_data: string): Array<Instruction | Data> {
 }
 
 function post_process(program_body: Instruction[], lexical_environment: LexicalEnvironment): Array<Instruction | Data>{
+    lexical_environment.functions.push(...Object.values(STANDARD_FUNCTIONS))
     const {program, variables_offset, functions_offset}: ProgramTemplate
         = create_program_template(program_body, lexical_environment);
 
@@ -115,7 +117,7 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
     return program;
 }
 
-// eslint-disable-next-line max-lines-per-function
+
 function create_program_template(program: Instruction[], lexical_environment: LexicalEnvironment): ProgramTemplate{
     const variables = lexical_environment.variables.map(() => ({value: 0}));
 
@@ -469,50 +471,65 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
     return result;
 }
 
-
 // eslint-disable-next-line max-lines-per-function
 function parse_logical_expression(input: string, lexical_environment: LexicalEnvironment): [Instruction[], number | null] {
     const result: Instruction[] = [];
 
-    const {action, first, second, third} = expression_to_parts(input);
-
-    if(third !== undefined)
-        throw new Error(`Too many arguments in logical expression, expected 3: ${input}`);
-
     let jmp: Instruction | null = null;
-    if(ComparisonOperator[action] === undefined)
-        throw new Error(`Invalid logical operator, expected one of [${Object.keys(ComparisonOperator).join(", ")}]: ${action}`);
 
     if (input.startsWith("(")) { // condition is an expression
-        result.push(...parse_or_load(second, lexical_environment));
+        const {action, first, second, third} = expression_to_parts(input);
 
-        result.push({
-            line: 0,
-            source: second,
-            opcode: Opcode.PUSH,
-            arg: 0
-        });
+        if(ComparisonOperator[action] === undefined) {
+            result.push(...parse(input, lexical_environment),
+                {
+                    line: 0,
+                    source: input,
+                    opcode: Opcode.CMP,
+                    arg: 0
+                });
 
-        result.push(...parse_or_load(first, lexical_environment));
+            jmp = {
+                line: 0,
+                source: input,
+                opcode: Opcode.JZ,
+                arg: 0
+            }
+        }else{
+            if(third !== undefined)
+                throw new Error(`Too many arguments in logical expression, expected 3: ${input}`);
 
-        result.push({
-            line: 0,
-            source: input,
-            opcode: Opcode.CMP,
-            arg: {addressing: Addressing.Stack, value: 0}
-        },{
-            line: 0,
-            source: input,
-            opcode: Opcode.FLUSH,
-            arg: 0
-        })
+            result.push(...parse_or_load(second, lexical_environment));
 
-        jmp = {
-            line: 0,
-            source: input,
-            opcode: ComparisonOperator[action],
-            arg: 0
+            result.push({
+                line: 0,
+                source: second,
+                opcode: Opcode.PUSH,
+                arg: 0
+            });
+
+            result.push(...parse_or_load(first, lexical_environment));
+
+            result.push({
+                line: 0,
+                source: input,
+                opcode: Opcode.CMP,
+                arg: {addressing: Addressing.Stack, value: 0}
+            },{
+                line: 0,
+                source: input,
+                opcode: Opcode.FLUSH,
+                arg: 0
+            })
+
+            jmp = {
+                line: 0,
+                source: input,
+                opcode: ComparisonOperator[action],
+                arg: 0
+            }
         }
+
     } else // condition is a variable or constant
     if (input === "false") {
         jmp = {
@@ -535,7 +552,6 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
 
     return [result, jmp && result.push(jmp) - 1];
 }
-
 
 /**
  * Parses 'if' expressions of next template 'if (> x y) (expression) (expression)' or 'if x (expression) (expression)'
@@ -651,92 +667,34 @@ function parse_while(input: string, lexical_environment: LexicalEnvironment): In
 function parse_print(input: string, lexical_environment: LexicalEnvironment): Instruction[] {
     const result: Instruction[] = [];
 
+    const CALL_PRINT_INT: Instruction = {
+        line: 0,
+        source: "call print_number",
+        opcode: Opcode.CALL,
+        arg: {type: "function", name: DefaultLibrary.PrintNumber}
+    };
+
+    const CALL_PRINT_STRING: Instruction = {
+        line: 0,
+        source: "call print_string",
+        opcode: Opcode.CALL,
+        arg: {type: "function", name: DefaultLibrary.PrintString}
+    }
+
     const {first} = expression_to_parts(input);
 
     if(first.startsWith("(")){
         const expression = cut_expression(first);
-        result.push(...parse(expression, lexical_environment), ...print_int(input));
+        result.push(...parse(expression, lexical_environment), CALL_PRINT_INT);
     }else if (get_value_type(first, lexical_environment) === 'int')
-        result.push(load_value(first, lexical_environment), ...print_int(input));
+        result.push(load_value(first, lexical_environment), CALL_PRINT_INT);
     else {
         result.push(load_value(first, lexical_environment));// Loads address of string
-        result.push(...print_string(input));
+        result.push(CALL_PRINT_STRING);
     }
 
     return result
 }
-
-function print_string(source: string): Instruction[]{
-    const result: Instruction[] = [];
-    const push = create_instruction(Opcode.PUSH);
-    const pop = create_instruction(Opcode.POP);
-    const ld_address: Instruction = create_instruction(Opcode.LD, {addressing: Addressing.Stack, value: 1});
-    const st_address: Instruction = create_instruction(Opcode.ST, {addressing: Addressing.Stack, value: 1});
-    const ld_length = create_instruction(Opcode.LD, {addressing: Addressing.Stack, value: 0});
-    const st_length = create_instruction(Opcode.ST, {addressing: Addressing.Stack, value: 0});
-    const increment = create_instruction(Opcode.INC);
-    const decrement = create_instruction(Opcode.DEC);
-    const ld_char = create_instruction(Opcode.LD, {addressing: Addressing.Accumulator, value: 0});
-    result.push(
-        push,
-        ld_char,
-        push,
-        ld_address,
-        increment,
-        st_address,
-        ld_char,
-        create_instruction(Opcode.ST, {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}),
-        ld_length,
-        decrement,
-        st_length,
-        create_instruction(Opcode.GE, {addressing: Addressing.Relative, value: -9}),
-        pop,
-        pop
-    );
-    
-    
-    return result;
-    function create_instruction(opcode: Opcode, arg: number | TargetAddress | Address = 0): Instruction{
-        return {
-            line: 0,
-            source,
-            opcode,
-            arg
-        }
-    }
-}
-
-function print_int(source: string): Instruction[]{
-    const FROM_RADIX = 10;
-    const TO_ASCII = 48;
-    return [
-        create_instruction(Opcode.PUSH),
-        create_instruction(Opcode.LD, 0),
-        create_instruction(Opcode.SWAP),
-
-        create_instruction(Opcode.PUSH),
-        create_instruction(Opcode.MOD, FROM_RADIX),
-        create_instruction(Opcode.ADD, TO_ASCII),
-        create_instruction(Opcode.SWAP),
-        create_instruction(Opcode.DIV, FROM_RADIX),
-        create_instruction(Opcode.JNZ, {addressing: Addressing.Relative, value: -6}),
-
-        create_instruction(Opcode.ADD, TO_ASCII),
-        create_instruction(Opcode.ST, {addressing: Addressing.Absolute, value: OUTPUT_ADDRESS}),
-        create_instruction(Opcode.POP),
-        create_instruction(Opcode.CMP, 0),
-        create_instruction(Opcode.JNZ, {addressing: Addressing.Relative, value: -4}),
-    ];
-    function create_instruction(opcode: Opcode, arg: number | TargetAddress | Address = 0): Instruction{
-        return {
-            line: 0,
-            source,
-            opcode,
-            arg
-        }
-    }
-}
-
 
 /**
  * Reads char from stdin and writes it to variable
