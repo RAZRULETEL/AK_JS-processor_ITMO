@@ -8,7 +8,8 @@ export enum Syntax {
     SET = "setq",
     PRINT = "print",
     PRINT_CHAR = "printc", // Doesn't convert value to ASCII
-    INPUT = "input",
+    READ = "read",
+    READ_STRING = "read-line",
 }
 
 export const ComparisonOperator: { [key: string]: Opcode } = {
@@ -30,7 +31,8 @@ export const MathOperators: { [key: string]: Opcode } = {
 
 interface Variable {
     name: string;
-    type: 'int' | 'string';
+    type: 'int' | 'string' | 'allocation';
+    length?: number;
 }
 
 /**
