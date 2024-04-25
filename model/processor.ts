@@ -1,4 +1,4 @@
-import {Addressing, Opcode, Register, data_to_instruction} from "../byte-code";
+import {Address, Addressing, Opcode, Register, data_to_instruction} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
@@ -158,19 +158,29 @@ export class Processor {
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
-        if(OPERANDS_REQUIRES_DATA_FETCH.includes(this.registers.PR.opcode)) {
-            const instruction = this.registers.PR;
-            if (instruction.opcode === Opcode.SWAP ||instruction.opcode === Opcode.POP || typeof instruction.arg === 'object') {
+
+        const instruction = this.registers.PR;
+
+        const is_indirect_stack = typeof instruction.arg === 'object'
+            && "addressing" in instruction.arg
+            && instruction.arg.addressing === Addressing.IndirectStack;
+
+        if(OPERANDS_REQUIRES_DATA_FETCH.includes(this.registers.PR.opcode) || is_indirect_stack) {
+            if ([Opcode.SWAP, Opcode.POP].includes(instruction.opcode) || typeof instruction.arg === 'object') {
 
                 this.latch_buffer_register(this.alu_operation(Register.IP));
-                if(instruction.opcode === Opcode.SWAP || instruction.opcode === Opcode.POP){
+                if([Opcode.SWAP, Opcode.POP].includes(instruction.opcode) || is_indirect_stack) {
                     this.latch_instruction_pointer(this.alu_operation(Register.SP));
                 }else
                     this.latch_instruction_pointer(this.fetch_instruction_address());
 
                 this.latch_data_register();
+                // if(is_indirect_stack){
+                //     this.latch_instruction_pointer(this.alu_operation(Register.DR));
+                //     this.latch_data_register();
+                // }
                 this.latch_instruction_pointer(this.alu_operation(Register.BR));
-                this.latch_buffer_register(this.alu_operation(Register.DR))
+                this.latch_buffer_register(this.alu_operation(Register.DR));
             }else{// direct load
                 this.latch_buffer_register(this.alu_operation(Register.ZR, instruction.arg));
             }
@@ -240,9 +250,16 @@ export class Processor {
                 this.latch_accumulator(this.alu_operation(Register.DR));
         }
 
+        const arg: Address | false = typeof this.registers.PR.arg === 'object'
+            && "addressing" in this.registers.PR.arg
+            && this.registers.PR.arg;
+        const is_indirect_stack = arg ? arg.addressing === Addressing.IndirectStack : false;
+
         if(this.registers.PR.opcode === Opcode.ST){
+            if(!arg)
+                throw new Error("ST instruction must have address!");
             this.latch_buffer_register(this.alu_operation(Register.IP));
-            this.latch_instruction_pointer(this.fetch_instruction_address());
+            this.latch_instruction_pointer(is_indirect_stack ? this.alu_operation(Register.DR, arg.value) : this.fetch_instruction_address());
             this.latch_memory(this.alu_operation(Register.ACC));
             this.latch_instruction_pointer(this.alu_operation(Register.BR));
         }
@@ -260,8 +277,10 @@ export class Processor {
                 return this.alu_operation(Register.ZR, this.registers.PR.arg.value);
             else if(this.registers.PR.arg.addressing === Addressing.Stack)
                 return this.alu_operation(Register.SP, this.registers.PR.arg.value);
-            else
+            else if(this.registers.PR.arg.addressing === Addressing.Accumulator)
                 return this.alu_operation(Register.ACC, this.registers.PR.arg.value);
+            else
+                throw new Error(`Invalid addressing: ${this.registers.PR.arg.addressing}`);
         else
             throw new Error("Instruction must have Address arg");
     }

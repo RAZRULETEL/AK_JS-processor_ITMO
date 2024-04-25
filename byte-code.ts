@@ -1,10 +1,15 @@
 /* eslint-disable no-magic-numbers */
 
+
+export const OUTPUT_ADDRESS = 1;
+export const INPUT_ADDRESS = 2;
+
 export enum Addressing {// Zero reserved for direct load
     Relative = 1,
     Absolute = 2,
     Stack = 3,
     Accumulator = 4,
+    IndirectStack = 5
 }
 
 

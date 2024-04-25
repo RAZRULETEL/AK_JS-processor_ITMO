@@ -30,9 +30,9 @@ export const JMP_CHECK_CONDITION: {[key: number]: (value: Flags) => boolean} = {
     [Opcode.EQ]: (flags) => flags.Zero === 1,
     [Opcode.NEQ]: (flags) => flags.Zero === 0,
     [Opcode.GT]: (flags) => (flags.Zero === 0) && (flags.Negative === flags.Overflow),
-    [Opcode.GE]: (flags) => flags.Negative === flags.Overflow,
+    [Opcode.GE]: (flags) => flags.Negative === flags.Overflow || flags.Zero === 1,
     [Opcode.LT]: (flags) => flags.Negative !== flags.Overflow,
-    [Opcode.LE]: (flags) => flags.Zero === 1,
+    [Opcode.LE]: (flags) => flags.Zero === 1 || (flags.Negative !== flags.Overflow),
     [Opcode.JNZ]: (flags) => flags.Zero === 0,
     [Opcode.JZ]: (flags) => flags.Zero === 1
 }
