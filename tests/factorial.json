@@ -19,8 +19,8 @@
 				"source": "",
 				"opcode": 14,
 				"arg": {
-					"addressing": "relative",
-					"value": 2
+					"addressing": 1,
+					"value": 3
 				}
 			},
 			{
@@ -28,6 +28,9 @@
 			},
 			{
 				"value": 2
+			},
+			{
+				"value": 83
 			},
 			{
 				"line": 0,
@@ -46,8 +49,8 @@
 				"source": "(factorial (5))",
 				"opcode": 17,
 				"arg": {
-					"addressing": "absolute",
-					"value": 8
+					"addressing": 2,
+					"value": 9
 				}
 			},
 			{
@@ -58,11 +61,11 @@
 			},
 			{
 				"line": 0,
-				"source": "(print (factorial (5)))",
-				"opcode": 24,
+				"source": "call print_number",
+				"opcode": 17,
 				"arg": {
-					"addressing": "absolute",
-					"value": 1
+					"addressing": 2,
+					"value": 31
 				}
 			},
 			{
@@ -88,7 +91,7 @@
 				"source": "x",
 				"opcode": 23,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 2
 				}
 			},
@@ -97,7 +100,7 @@
 				"source": "(<= x 1)",
 				"opcode": 21,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 0
 				}
 			},
@@ -112,7 +115,7 @@
 				"source": "(<= x 1)",
 				"opcode": 10,
 				"arg": {
-					"addressing": "relative",
+					"addressing": 1,
 					"value": 2
 				}
 			},
@@ -127,7 +130,7 @@
 				"source": "(if (<= x 1))",
 				"opcode": 14,
 				"arg": {
-					"addressing": "relative",
+					"addressing": 1,
 					"value": 12
 				}
 			},
@@ -148,7 +151,7 @@
 				"source": "x",
 				"opcode": 23,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 2
 				}
 			},
@@ -157,7 +160,7 @@
 				"source": "(- x 1)",
 				"opcode": 4,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 0
 				}
 			},
@@ -178,8 +181,8 @@
 				"source": "(factorial (- x 1))",
 				"opcode": 17,
 				"arg": {
-					"addressing": "absolute",
-					"value": 8
+					"addressing": 2,
+					"value": 9
 				}
 			},
 			{
@@ -199,7 +202,7 @@
 				"source": "x",
 				"opcode": 23,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 2
 				}
 			},
@@ -208,7 +211,7 @@
 				"source": "(* x (factorial (- x 1)))",
 				"opcode": 5,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 0
 				}
 			},
@@ -223,13 +226,376 @@
 				"source": "",
 				"opcode": 24,
 				"arg": {
-					"addressing": "stack",
+					"addressing": 3,
 					"value": 1
 				}
 			},
 			{
 				"line": 0,
 				"source": "ret factorial",
+				"opcode": 18,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "write null-terminator",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "push digits to stack",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 7,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 3,
+				"arg": 48
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 6,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 16,
+				"arg": {
+					"addressing": 1,
+					"value": -6
+				}
+			},
+			{
+				"line": 0,
+				"source": "write digits to output",
+				"opcode": 3,
+				"arg": 48
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 21,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 16,
+				"arg": {
+					"addressing": 1,
+					"value": -4
+				}
+			},
+			{
+				"line": 0,
+				"source": "ret from print@number",
+				"opcode": 18,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "save string address to stack",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 4,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 4,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 20,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 10,
+				"arg": {
+					"addressing": 1,
+					"value": -9
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "ret from print@string",
+				"opcode": 18,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 2,
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 21,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 13,
+				"arg": {
+					"addressing": 1,
+					"value": 5
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 5,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 14,
+				"arg": {
+					"addressing": 1,
+					"value": -11
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 4,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 5,
+					"value": -1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "ret from read@string",
 				"opcode": 18,
 				"arg": 0
 			}

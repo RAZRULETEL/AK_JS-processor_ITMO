@@ -22,6 +22,7 @@ describe('Running golden tests', () => {
     it.each([
         "tests/factorial.json",
         "tests/prob1.json",
+        "tests/hello.json",
     ])(`from file %p`, (test_config: string) => {
         const config = JSON.parse(fs.readFileSync(test_config, "utf8")) as GoldenTestConfig;
 

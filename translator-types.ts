@@ -15,10 +15,10 @@ export enum Syntax {
 export const ComparisonOperator: { [key: string]: Opcode } = {
     "=": Opcode.JNZ,
     "!=": Opcode.JZ,
-    "<": Opcode.LT,
-    ">": Opcode.GT,
-    "<=": Opcode.LE,
-    ">=": Opcode.GE
+    "<": Opcode.GE,
+    ">": Opcode.LE,
+    "<=": Opcode.GT,
+    ">=": Opcode.LT
 }
 
 export const MathOperators: { [key: string]: Opcode } = {
