@@ -1,0 +1,483 @@
+{
+	"input_lisp": [
+		"(",
+		"    (setq x 0)",
+		"        (while (read x) (",
+		"            (printc x)",
+		"        ))",
+		")"
+	],
+	"input_stdin": "Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input!",
+	"output_stdout": "Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input!",
+	"output_json": {
+		"output": 1,
+		"input": 2,
+		"program": [
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 14,
+				"arg": {
+					"addressing": 1,
+					"value": 4
+				}
+			},
+			{
+				"value": 1
+			},
+			{
+				"value": 2
+			},
+			{
+				"value": 66
+			},
+			{
+				"value": 0
+			},
+			{
+				"line": 0,
+				"source": "0",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(setq x 0)",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(read x)",
+				"opcode": 23,
+				"arg": {
+					"addressing": 2,
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "(read x)",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "(read x)",
+				"opcode": 21,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "(read x)",
+				"opcode": 15,
+				"arg": {
+					"addressing": 1,
+					"value": 3
+				}
+			},
+			{
+				"line": 0,
+				"source": "x",
+				"opcode": 23,
+				"arg": {
+					"addressing": 2,
+					"value": 4
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "while (read x)",
+				"opcode": 14,
+				"arg": {
+					"addressing": 1,
+					"value": -7
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 22,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "write null-terminator",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "push digits to stack",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 7,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 3,
+				"arg": 48
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 6,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 16,
+				"arg": {
+					"addressing": 1,
+					"value": -6
+				}
+			},
+			{
+				"line": 0,
+				"source": "write digits to output",
+				"opcode": 3,
+				"arg": 48
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 21,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 16,
+				"arg": {
+					"addressing": 1,
+					"value": -4
+				}
+			},
+			{
+				"line": 0,
+				"source": "ret from print@number",
+				"opcode": 18,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "save string address to stack",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 4,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 4,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 2,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 20,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 12,
+				"arg": {
+					"addressing": 1,
+					"value": -9
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "ret from print@string",
+				"opcode": 18,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 1,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 2,
+					"value": 2
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 21,
+				"arg": 10
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 13,
+				"arg": {
+					"addressing": 1,
+					"value": 5
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 5,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 23,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 19,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 3,
+					"value": 1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 14,
+				"arg": {
+					"addressing": 1,
+					"value": -11
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 2,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 4,
+				"arg": {
+					"addressing": 3,
+					"value": 0
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 26,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 24,
+				"arg": {
+					"addressing": 5,
+					"value": -1
+				}
+			},
+			{
+				"line": 0,
+				"source": "",
+				"opcode": 25,
+				"arg": 0
+			},
+			{
+				"line": 0,
+				"source": "ret from read@string",
+				"opcode": 18,
+				"arg": 0
+			}
+		]
+	}
+}
