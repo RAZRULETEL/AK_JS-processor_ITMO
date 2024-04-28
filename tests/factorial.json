@@ -425,7 +425,7 @@
 			{
 				"line": 0,
 				"source": "",
-				"opcode": 10,
+				"opcode": 12,
 				"arg": {
 					"addressing": 1,
 					"value": -9

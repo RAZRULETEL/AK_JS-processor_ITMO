@@ -62,7 +62,7 @@ export const STANDARD_FUNCTIONS: {[key: string]: FunctionContainer} = {
             create_instruction(Opcode.LD, {addressing: Addressing.Stack, value: 0}),
             create_instruction(Opcode.DEC),
             create_instruction(Opcode.ST, {addressing: Addressing.Stack, value: 0}),
-            create_instruction(Opcode.GT, {addressing: Addressing.Relative, value: -9}),
+            create_instruction(Opcode.GE, {addressing: Addressing.Relative, value: -9}),
             pop,
             pop,
             create_instruction(Opcode.RET, 0, `ret from ${DefaultLibrary.PrintString}`),
