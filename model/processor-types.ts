@@ -1,5 +1,15 @@
 import {Data, Instruction, Opcode} from "../byte-code";
 
+export enum Register {
+    ACC = 'ACC', // accumulator
+    IP = 'IP', // instruction pointer
+    SP = 'SP', // stack pointer
+    BR = 'BR', // buffer register
+    DR = 'DR', // data register | read-write from memory
+    PR = 'PR', // program register,
+    ZR = 'ZR', // always zero
+}
+
 export enum ProcessorState {
     Uninitialized = "Uninitialized",
     FetchingInstruction = "FetchingInstruction",

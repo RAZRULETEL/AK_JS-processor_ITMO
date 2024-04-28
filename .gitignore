@@ -1,6 +1,5 @@
 # Project exclude paths
-/byte-code.js
-/byte-code.js.map
-/translator.js
-/translator.js.map
 /.idea
+/node_modules
+/**/*.js
+/**/*.js.map

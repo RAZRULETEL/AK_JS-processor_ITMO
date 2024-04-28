@@ -1,5 +1,9 @@
 import {Data, Instruction, Opcode} from "./byte-code";
 
+export interface TargetAddress{
+    type: 'variable' | 'function' | 'stack' | 'string';
+    name: string;
+}
 
 export enum Syntax {
     IF = "if",

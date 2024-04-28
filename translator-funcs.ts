@@ -1,5 +1,5 @@
-import {Address, Addressing, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode, TargetAddress} from "./byte-code";
-import {FunctionContainer} from "./translator-types";
+import {Address, Addressing, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
+import {FunctionContainer, TargetAddress} from "./translator-types";
 
 export enum DefaultLibrary {
     PrintNumber = 'print@number',

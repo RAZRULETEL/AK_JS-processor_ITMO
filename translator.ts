@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {Addressing, Data, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode, TargetAddress} from "./byte-code";
+import {Addressing, Data, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
 import {
     ComparisonOperator,
     FunctionContainer,
@@ -7,7 +7,7 @@ import {
     MathOperators,
     ProgramTemplate,
     SourceProgram,
-    Syntax
+    Syntax, TargetAddress
 } from "./translator-types";
 import {DefaultLibrary, STANDARD_FUNCTIONS} from "./translator-funcs";
 

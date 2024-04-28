@@ -1,6 +1,6 @@
-import {Opcode, Register} from "../byte-code";
+import {Flags, Register} from "./processor-types";
 import {Processor, REGISTER_BITS_SIZE} from "./processor";
-import {Flags} from "./processor-types";
+import {Opcode} from "../byte-code";
 
 const RADIX = 2;
 

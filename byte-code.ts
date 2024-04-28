@@ -1,5 +1,7 @@
 /* eslint-disable no-magic-numbers */
+// Here contained interfaces, enums, constants used in both processor and translator
 
+import {TargetAddress} from "./translator-types";
 
 export const OUTPUT_ADDRESS = 1;
 export const INPUT_ADDRESS = 2;
@@ -16,21 +18,6 @@ export enum Addressing {// Zero reserved for direct load
 export interface Address{
     addressing: Addressing;
     value: number;
-}
-
-export interface TargetAddress{
-    type: 'variable' | 'function' | 'stack' | 'string';
-    name: string;
-}
-
-export enum Register {
-    ACC = 'ACC', // accumulator
-    IP = 'IP', // instruction pointer
-    SP = 'SP', // stack pointer
-    BR = 'BR', // buffer register
-    DR = 'DR', // data register | read-write from memory
-    PR = 'PR', // program register,
-    ZR = 'ZR', // always zero
 }
 
 export enum Opcode {
@@ -73,6 +60,7 @@ export interface Instruction {
 export interface Data {
     value: number;
 }
+
 // Instruction format:
 // xxxx xxaa a000 ...
 // x - opcode, a - addressing, 0 - value

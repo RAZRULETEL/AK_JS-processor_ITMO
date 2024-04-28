@@ -1,10 +1,10 @@
-import {Address, Addressing, Opcode, Register, data_to_instruction} from "../byte-code";
+import {Address, Addressing, Opcode, data_to_instruction} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
     OPERANDS_REQUIRES_DATA_FETCH,
     ProcessorRegisters,
-    ProcessorState,
+    ProcessorState, Register,
     STACK_OPERANDS
 } from "./processor-types";
 import {AluOperation} from "./alu";
