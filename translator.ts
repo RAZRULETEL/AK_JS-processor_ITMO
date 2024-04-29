@@ -517,17 +517,17 @@ function parse_logical_expression(input: string, lexical_environment: LexicalEnv
     function create_logical_expression(operator: Opcode, first_arg: string, second_arg: string){
         result.push(
             ...parse_or_load(second_arg, lexical_environment),
-            create_instruction(Opcode.PUSH),
+            create_instruction(Opcode.PUSH, 0, second_arg),
             ...parse_or_load(first_arg, lexical_environment),
             create_instruction(Opcode.CMP, {addressing: Addressing.Stack, value: 0}),
             create_instruction(Opcode.FLUSH));
 
         jmp = create_instruction(operator)
     }
-    function create_instruction(opcode: Opcode, arg: number | Address | TargetAddress = 0): Instruction{
+    function create_instruction(opcode: Opcode, arg: number | Address | TargetAddress = 0, source: string = input): Instruction{
         return {
             line: 0,
-            source: input,
+            source,
             opcode,
             arg
         }
