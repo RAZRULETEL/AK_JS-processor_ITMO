@@ -175,10 +175,6 @@ export class Processor {
                     this.latch_instruction_pointer(this.fetch_instruction_address());
 
                 this.latch_data_register();
-                // if(is_indirect_stack){
-                //     this.latch_instruction_pointer(this.alu_operation(Register.DR));
-                //     this.latch_data_register();
-                // }
                 this.latch_instruction_pointer(this.alu_operation(Register.BR));
                 this.latch_buffer_register(this.alu_operation(Register.DR));
             }else{// direct load
@@ -188,7 +184,6 @@ export class Processor {
         this.state = ProcessorState.Executing;
     }
 
-    // eslint-disable-next-line max-statements
     private execute(){
         if(this.state !== ProcessorState.Executing)
             throw new Error(`Processor have incorrect state: ${this.state}`);

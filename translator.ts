@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import {Addressing, Data, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
+import {Address, Addressing, Data, INPUT_ADDRESS, Instruction, OUTPUT_ADDRESS, Opcode} from "./byte-code";
 import {
     ComparisonOperator,
     FunctionContainer,
@@ -7,7 +7,8 @@ import {
     MathOperators,
     ProgramTemplate,
     SourceProgram,
-    Syntax, TargetAddress
+    Syntax,
+    TargetAddress
 } from "./translator-types";
 import {DefaultLibrary, STANDARD_FUNCTIONS} from "./translator-funcs";
 
@@ -115,8 +116,6 @@ function post_process(program_body: Instruction[], lexical_environment: LexicalE
     return program;
 }
 
-
-// eslint-disable-next-line max-lines-per-function
 function create_program_template(program: Instruction[], lexical_environment: LexicalEnvironment): ProgramTemplate{
     const variables = lexical_environment.variables.map(() => ({value: 0}));
 
@@ -157,29 +156,7 @@ function create_program_template(program: Instruction[], lexical_environment: Le
     template.functions_offset = template.program.length;
     template.program.push(...lexical_environment.functions.flatMap(el => el.body));
 
-    const strings: { [name: string]: number } = {};
-    for (const instruction of program) {
-        if (typeof instruction.arg === 'object' && 'type' in instruction.arg) {
-            const target: TargetAddress = instruction.arg;
-                const variable_index = lexical_environment.variables.findIndex(el => el.name === target.name);
-                if(target.type !== 'string')
-                    continue;
-                if (strings[target.name] === undefined) {
-                    strings[target.name] = template.program.length;
-                    if (variable_index < 0 || lexical_environment.variables[variable_index].type === 'string') {
-                        template.program.push({value: instruction.arg.name.length - 1 - 1});
-                        template.program.push(...instruction.arg.name.slice(1, -1).split("").map(el => ({value: el.charCodeAt(0)})));
-                    } else {
-                        const string_length = lexical_environment.variables[variable_index].length;
-                        template.program.push({value: 0});
-                        template.program.push(...(new Array(string_length).fill(0).map(() => ({value: 0}))));
-                    }
-                }
-                instruction.arg = strings[instruction.arg.name];
-        }
-    }
-
-    console.log(strings);
+    post_process_strings(template, lexical_environment, program);
 
     free_memory.value = template.program.length;
 
@@ -206,6 +183,35 @@ function post_process_function_variables(functions: FunctionContainer[]) {
 }
 
 
+/**
+ * This function post-processes strings in the program template based on lexical environment.
+ * @param template - The program template to reserve memory for strings.
+ * @param lexical_environment - The lexical environment containing variables.
+ * @param program - Instructions to process strings.
+ */
+function post_process_strings(template: ProgramTemplate, lexical_environment: LexicalEnvironment, program: Instruction[]) {
+    const strings: { [name: string]: number } = {};
+    for (const instruction of program) {
+        if (typeof instruction.arg === 'object' && 'type' in instruction.arg) {
+            const target: TargetAddress = instruction.arg;
+            const variable_index = lexical_environment.variables.findIndex(el => el.name === target.name);
+            if(target.type !== 'string')
+                continue;
+            if (strings[target.name] === undefined) {
+                strings[target.name] = template.program.length;
+                if (variable_index < 0 || lexical_environment.variables[variable_index].type === 'string') {
+                    template.program.push({value: instruction.arg.name.length - 1 - 1});
+                    template.program.push(...instruction.arg.name.slice(1, -1).split("").map(el => ({value: el.charCodeAt(0)})));
+                } else {
+                    const string_length = lexical_environment.variables[variable_index].length;
+                    template.program.push({value: 0});
+                    template.program.push(...(new Array(string_length).fill(0).map(() => ({value: 0}))));
+                }
+            }
+            instruction.arg = strings[instruction.arg.name];
+        }
+    }
+}
 
 function parse(input_data: string, lexical_environment: LexicalEnvironment): Instruction[] {
     console.log("Parse ", !!lexical_environment.parent, input_data);
@@ -393,13 +399,8 @@ function parse_function_body(input_body: string, lexical_environment: LexicalEnv
     return body;
 }
 
-// eslint-disable-next-line max-lines-per-function
 function parse_call_function(name: string, args: string, lexical_environment: LexicalEnvironment): Instruction[]{
     const result: Instruction[] = []
-
-    console.log(`Call ${name} with args '${args}'`);
-    if(!args.startsWith("("))
-        throw new Error("Function call must have args expression!");
 
     if(args.startsWith("("))
         args = args.substring(1, args.length - 1);
@@ -430,7 +431,6 @@ function parse_call_function(name: string, args: string, lexical_environment: Le
                 args_count++;
             }
         }
-
     result.push({
         line: 0,
         source: `(${name} (${args}))`,
@@ -483,86 +483,55 @@ function parse_math(input: string, lexical_environment: LexicalEnvironment): Ins
     return result;
 }
 
-// eslint-disable-next-line max-lines-per-function
 function parse_logical_expression(input: string, lexical_environment: LexicalEnvironment): [Instruction[], number | null] {
     const result: Instruction[] = [];
-
     let jmp: Instruction | null = null;
 
     if (input.startsWith("(")) { // condition is an expression
         const {action, first, second, third} = expression_to_parts(input);
 
-        if(ComparisonOperator[action] === undefined) {
-            result.push(...parse(input, lexical_environment),
-                {
-                    line: 0,
-                    source: input,
-                    opcode: Opcode.CMP,
-                    arg: 0
-                });
+        if(ComparisonOperator[action] === undefined) {// not logical expression
+            result.push(
+                ...parse(input, lexical_environment),
+                create_instruction(Opcode.CMP));
 
-            jmp = {
-                line: 0,
-                source: input,
-                opcode: Opcode.JZ,
-                arg: 0
-            }
+            jmp = create_instruction(Opcode.JZ);
         }else{
             if(third !== undefined)
                 throw new Error(`Too many arguments in logical expression, expected 3: ${input}`);
 
-            result.push(...parse_or_load(second, lexical_environment));
-
-            result.push({
-                line: 0,
-                source: second,
-                opcode: Opcode.PUSH,
-                arg: 0
-            });
-
-            result.push(...parse_or_load(first, lexical_environment));
-
-            result.push({
-                line: 0,
-                source: input,
-                opcode: Opcode.CMP,
-                arg: {addressing: Addressing.Stack, value: 0}
-            },{
-                line: 0,
-                source: input,
-                opcode: Opcode.FLUSH,
-                arg: 0
-            })
-
-            jmp = {
-                line: 0,
-                source: input,
-                opcode: ComparisonOperator[action],
-                arg: 0
-            }
+            create_logical_expression(ComparisonOperator[action], first, second);
         }
-
     } else // condition is a variable or constant
     if (input === "false") {
-        jmp = {
-            line: 0,
-            source: input,
-            opcode: Opcode.JMP,
-            arg: 0
-        }
+        jmp = create_instruction(Opcode.JMP)
     } else if (input === "true") {
         jmp = null;
     } else {
         result.push(load_value(input, lexical_environment));
-        jmp = {
-            line: 0,
-            source: input,
-            opcode: Opcode.JZ,
-            arg: 0
-        }
+        jmp = create_instruction(Opcode.JZ)
     }
 
     return [result, jmp && result.push(jmp) - 1];
+
+    function create_logical_expression(operator: Opcode, first_arg: string, second_arg: string){
+        result.push(
+            ...parse_or_load(second_arg, lexical_environment),
+            create_instruction(Opcode.PUSH),
+            ...parse_or_load(first_arg, lexical_environment),
+            create_instruction(Opcode.CMP, {addressing: Addressing.Stack, value: 0}),
+            create_instruction(Opcode.FLUSH));
+
+        jmp = create_instruction(operator)
+    }
+    function create_instruction(opcode: Opcode, arg: number | Address | TargetAddress = 0): Instruction{
+        return {
+            line: 0,
+            source: input,
+            opcode,
+            arg
+        }
+    }
 }
 
 /**
