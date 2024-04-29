@@ -58,3 +58,9 @@ export const STACK_OPERANDS: Opcode[] = [
     Opcode.RET, Opcode.PUSH, Opcode.FLUSH
 ];
 
+export enum LogLevel {
+    None,
+    Instruction,
+    Tick,
+    Phase
+}

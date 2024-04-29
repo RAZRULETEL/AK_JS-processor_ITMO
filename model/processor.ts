@@ -1,13 +1,16 @@
-import {Address, Addressing, Opcode, data_to_instruction} from "../byte-code";
+import {Address, Addressing, Opcode, data_to_instruction, instruction_to_data} from "../byte-code";
 import {
     Flags,
     JMP_CHECK_CONDITION,
+    LogLevel,
     OPERANDS_REQUIRES_DATA_FETCH,
     ProcessorRegisters,
-    ProcessorState, Register,
+    ProcessorState,
+    Register,
     STACK_OPERANDS
 } from "./processor-types";
 import {AluOperation} from "./alu";
+import {Logger} from "./logger";
 import {MemoryStorage} from "./memory";
 import {SourceProgram} from "../translator-types";
 import fs from "fs";
@@ -25,6 +28,7 @@ const PROB1_TIME_LIMIT = 1_000_000;
 
 
 export class Processor {
+    private readonly logger: Logger;
     private registers: ProcessorRegisters = {
         ACC: 0,
         IP: 0,
@@ -45,13 +49,14 @@ export class Processor {
 
     private time: number = 0; // tick counter
 
-    constructor(storage: MemoryStorage) {
+    constructor(storage: MemoryStorage, log_level: LogLevel = LogLevel.None) {
         this.storage = storage;
+        this.logger = new Logger(log_level);
     }
 
     tick() {
         this.time++;
-
+        this.logger.log(this.get_state(), LogLevel.Tick);
     }
 
     zero() {
@@ -148,6 +153,7 @@ export class Processor {
     private fetch_instruction(){
         if(this.state !== ProcessorState.FetchingInstruction)
             throw new Error(`Processor have incorrect state: ${this.state}`);
+        this.logger.log(this.get_state(), LogLevel.Phase);
         this.latch_data_register()
         this.latch_program_register();
         this.state = ProcessorState.FetchingData;
@@ -158,6 +164,7 @@ export class Processor {
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
+        this.logger.log(this.get_state(), LogLevel.Phase);
 
         const instruction = this.registers.PR;
 
@@ -189,6 +196,7 @@ export class Processor {
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
+        this.logger.log(this.get_state(), LogLevel.Phase);
 
         const opcode = this.registers.PR.opcode;
 
@@ -235,6 +243,7 @@ export class Processor {
             throw new Error(`Processor have incorrect state: ${this.state}`);
         if(!this.registers.PR)
             throw new Error("Processor have no instruction fetched");
+        this.logger.log(this.get_state(), LogLevel.Phase);
 
         if(this.registers.PR.opcode === Opcode.PUSH || this.registers.PR.opcode === Opcode.SWAP){
             this.latch_buffer_register(this.alu_operation(Register.IP));
@@ -282,7 +291,8 @@ export class Processor {
 
     get_state(): string{
         const flags = `N: ${this.flags.Negative} Z: ${this.flags.Zero} V: ${this.flags.Overflow} C: ${this.flags.Carry}`;
-        return `t: ${this.time}, state: ${this.state}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "none"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, ZR: ${this.registers.ZR}, ${flags}`
+        const DR = ("opcode" in this.registers.DR ? instruction_to_data(this.registers.DR) : this.registers.DR).value;
+        return `t: ${this.time}, state: ${this.state}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "X"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, DR: ${DR} , ZR: ${this.registers.ZR}, ${flags}`
     }
     
     start_simulation(time_limit: number) {
@@ -297,6 +307,7 @@ export class Processor {
                     break;
                 this.write_data();
                 this.latch_instruction_pointer();
+                this.logger.log(this.get_state(), LogLevel.Instruction);
             }
             if(this.time >= time_limit)
                 console.warn(`Time limit reached. ${this.get_state()}`);
@@ -307,7 +318,7 @@ export class Processor {
     }
 }
 
-
+// node processor.ts <program_code_file> <stdin_file> <time_limit>
 const program_code_file = process.argv[INPUT_FILE_ARG];
 if(program_code_file) {
     if(fs.existsSync(program_code_file)) {
@@ -329,4 +340,5 @@ export function simulate(program: SourceProgram, stdin: string, time_limit: numb
     memory.add_input(...stdin.split("").map(char => char.charCodeAt(0)));
     const processor = new Processor(memory);
     processor.start_simulation(time_limit);
+    process.stdout.write(memory.get_output().map(el => String.fromCharCode(el)).join(""));
 }

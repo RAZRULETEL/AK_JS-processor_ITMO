@@ -1,4 +1,4 @@
-import {Data, Instruction} from "../byte-code";
+import {Data, Instruction, instruction_to_data} from "../byte-code";
 
 export class MemoryStorage {
     readonly memory_size: number;
@@ -6,6 +6,7 @@ export class MemoryStorage {
     private readonly output: number;
     private readonly input: number;
     private input_buffer: number[] = [];
+    private output_buffer: number[] = [];
 
     constructor(memory_size: number, storage: {program: Array<Instruction | Data>, input: number, output: number}) {
         if (memory_size <= 0)
@@ -31,14 +32,18 @@ export class MemoryStorage {
             throw new Error(`Invalid address: ${address}`);
         if(address === this.output)
             if('value' in value)
-                process.stdout.write(String.fromCharCode(value.value));
+                this.output_buffer.push(value.value);
             else
-                process.stdout.write(JSON.stringify(value));
+                this.output_buffer.push(instruction_to_data(value).value);
         else
             this.storage[address] = value;
     }
 
     add_input(...input: number[]) {
         this.input_buffer.push(...input);
+    }
+
+    get_output(): number[] {
+        return this.output_buffer;
     }
 }
