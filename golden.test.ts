@@ -9,7 +9,9 @@ interface GoldenTestConfig {
     output_json: SourceProgram;
     input_stdin: string;
     output_stdout: string;
+    output_log_path: string;
 }
+const MAX_JOURNAL_LENGTH = 20_000;
 
 const TEST_TEMP_DIR = 'tmp';
 const TEST_PROCESSOR_TIME_LIMIT = 1_000_000;
@@ -30,6 +32,7 @@ describe('Running golden tests', () => {
         const TEMP_DIR = `tmp/test_${Crypto.randomUUID()}`;
         const OUTPUT_SOURCE = `${TEMP_DIR}/output.json`;
         const INPUT_STDIN = `${TEMP_DIR}/input`;
+        const OUTPUT_LOG = `${TEMP_DIR}/output`;
 
         try {
             await fs.promises.mkdir(TEMP_DIR, { recursive: true });
@@ -43,8 +46,12 @@ describe('Running golden tests', () => {
         execSync(`node ${TRANSLATOR_PATH} ${TEMP_DIR}/input.lisp ${OUTPUT_SOURCE}`);
         expect(JSON.parse(await fs.promises.readFile(OUTPUT_SOURCE, 'utf8'))).toEqual(config.output_json);
 
-        const stdout = execSync(`node ${PROCESSOR_PATH} ${OUTPUT_SOURCE} ${INPUT_STDIN} ${TEST_PROCESSOR_TIME_LIMIT}`);
+        const stdout = execSync(`node ${PROCESSOR_PATH} ${OUTPUT_SOURCE} ${INPUT_STDIN} ${OUTPUT_LOG} ${TEST_PROCESSOR_TIME_LIMIT}`);
         expect(stdout.toString()).toEqual(config.output_stdout);
+
+        const log = (await fs.promises.readFile(OUTPUT_LOG, 'utf8')).split("\n", MAX_JOURNAL_LENGTH).join("\n");
+        const target_log = await fs.promises.readFile(config.output_log_path, 'utf8');
+        expect(log).toEqual(target_log);
 
         await fs.promises.rm(TEMP_DIR, { recursive: true, force: true });
         try {

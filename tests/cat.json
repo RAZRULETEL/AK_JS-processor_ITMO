@@ -9,6 +9,7 @@
 	],
 	"input_stdin": "Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input!",
 	"output_stdout": "Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input! Theoretically endless input!",
+	"output_log_path": "tests/logs/cat.log",
 	"output_json": {
 		"output": 1,
 		"input": 2,

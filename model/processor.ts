@@ -19,7 +19,8 @@ import fs from "fs";
 export const REGISTER_BITS_SIZE = 32;
 const INPUT_FILE_ARG = 2;
 const STDIN_FILE_ARG = 3;
-const TIME_LIMIT_ARG = 4;
+const LOG_FILE_ARG = 4;
+const TIME_LIMIT_ARG = 5;
 
 const MEMORY_SIZE = 1024;
 const PROB1_TIME_LIMIT = 1_000_000;
@@ -49,9 +50,9 @@ export class Processor {
 
     private time: number = 0; // tick counter
 
-    constructor(storage: MemoryStorage, log_level: LogLevel = LogLevel.None) {
+    constructor(storage: MemoryStorage, logger: Logger) {
         this.storage = storage;
-        this.logger = new Logger(log_level);
+        this.logger = logger;
     }
 
     tick() {
@@ -80,6 +81,7 @@ export class Processor {
         }
 
         this.registers.IP++;
+        this.tick();
         const instruction = this.registers.PR;
         if (instruction &&
             (typeof instruction.arg === 'object')
@@ -94,8 +96,9 @@ export class Processor {
                     this.registers.IP = instruction.arg.value;
                 else
                     throw new Error(`Invalid addressing for jmp: ${instruction.arg.addressing}`);
+                this.tick();
         }
-        this.tick();
+
     }
 
     private latch_data_register(){
@@ -292,7 +295,7 @@ export class Processor {
     get_state(): string{
         const flags = `N: ${this.flags.Negative} Z: ${this.flags.Zero} V: ${this.flags.Overflow} C: ${this.flags.Carry}`;
         const DR = ("opcode" in this.registers.DR ? instruction_to_data(this.registers.DR) : this.registers.DR).value;
-        return `t: ${this.time}, state: ${this.state}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "X"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, DR: ${DR} , ZR: ${this.registers.ZR}, ${flags}`
+        return `t: ${this.time}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "X"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, DR: ${DR} , ZR: ${this.registers.ZR}, ${flags}`
     }
     
     start_simulation(time_limit: number) {
@@ -310,15 +313,15 @@ export class Processor {
                 this.logger.log(this.get_state(), LogLevel.Instruction);
             }
             if(this.time >= time_limit)
-                console.warn(`Time limit reached. ${this.get_state()}`);
+                this.logger.log(`Time limit reached. ${this.get_state()}`, LogLevel.Any);
         }catch (err: unknown) {
-            console.log(this.get_state())
-            console.error(`Simulation failed: ${(err as Error).message}`);
+            this.logger.log(this.get_state(), LogLevel.Any);
+            this.logger.log(`Simulation failed: ${(err as Error).message}`, LogLevel.Any);
         }
     }
 }
 
-// node processor.ts <program_code_file> <stdin_file> <time_limit>
+// node processor.ts <program_code_file> <stdin_file> <stdout_file> <time_limit>
 const program_code_file = process.argv[INPUT_FILE_ARG];
 if(program_code_file) {
     if(fs.existsSync(program_code_file)) {
@@ -326,8 +329,9 @@ if(program_code_file) {
             const input_data = JSON.parse(fs.readFileSync(program_code_file, 'utf8')) as SourceProgram;
             const stdin = process.argv[STDIN_FILE_ARG] ? fs.readFileSync(process.argv[STDIN_FILE_ARG], 'utf8') : "";
             const time_limit = process.argv[TIME_LIMIT_ARG] ? +process.argv[TIME_LIMIT_ARG] : PROB1_TIME_LIMIT
+            const log = process.argv[LOG_FILE_ARG];
 
-            simulate(input_data, stdin, time_limit);
+            simulate(input_data, stdin, time_limit, log);
         }else
             console.error(`File ${process.argv[STDIN_FILE_ARG]} does not exists!`);
     }else
@@ -335,10 +339,16 @@ if(program_code_file) {
 
 }
 
-export function simulate(program: SourceProgram, stdin: string, time_limit: number) {
+// eslint-disable-next-line max-params
+export function simulate(program: SourceProgram, stdin: string, time_limit: number, log_file?: string) {
     const memory = new MemoryStorage(MEMORY_SIZE, program);
     memory.add_input(...stdin.split("").map(char => char.charCodeAt(0)));
-    const processor = new Processor(memory);
+
+    const logger = new Logger(LogLevel.Tick);
+
+    const processor = new Processor(memory, logger);
     processor.start_simulation(time_limit);
     process.stdout.write(memory.get_output().map(el => String.fromCharCode(el)).join(""));
+    if(log_file)
+        fs.writeFileSync(log_file, logger.get_log().join("\n"), 'utf8');
 }

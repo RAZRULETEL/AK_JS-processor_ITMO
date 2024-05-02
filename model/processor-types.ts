@@ -37,8 +37,6 @@ export interface ProcessorRegisters{
 }
 
 export const JMP_CHECK_CONDITION: {[key: number]: (value: Flags) => boolean} = {
-    [Opcode.EQ]: (flags) => flags.Zero === 1,
-    [Opcode.NEQ]: (flags) => flags.Zero === 0,
     [Opcode.GT]: (flags) => (flags.Zero === 0) && (flags.Negative === 0),
     [Opcode.GE]: (flags) => flags.Negative === 0 || flags.Zero === 1,
     [Opcode.LT]: (flags) => flags.Negative === 1,
@@ -62,5 +60,6 @@ export enum LogLevel {
     None,
     Instruction,
     Tick,
-    Phase
+    Phase,
+    Any
 }

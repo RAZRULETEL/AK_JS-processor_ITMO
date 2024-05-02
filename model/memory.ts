@@ -22,8 +22,12 @@ export class MemoryStorage {
     get(address: number): Instruction | Data {
         if (address < 0 || address >= this.memory_size)
             throw new Error(`Invalid address: ${address}`);
-        if(address === this.input)
-            return {value: this.input_buffer.shift() || 0};
+        if (address === this.input) {
+            const value = this.input_buffer.shift();
+            if (value)
+                return {value};
+            throw new Error("Input buffer is empty");
+        }
         return this.storage[address];
     }
 
