@@ -1,6 +1,7 @@
 # Компилятор + процессор на TS [![Node.js CI](https://github.com/RAZRULETEL/AK_JS-processor_ITMO/actions/workflows/node.js.yml/badge.svg)](https://github.com/RAZRULETEL/AK_JS-processor_ITMO/actions/workflows/node.js.yml)
 
-Вариант: `lisp -> asm | acc | neum | hw | tick -> instr | struct | stream | mem | pstr | prob1 | cache`
+Вариант: `lisp -> asm | acc | neum | hw | tick -> instr | struct | stream | mem | pstr | prob1 | cache` </br>
+Отчёт: [REPORT.md](./REPORT.md)
 
 **Цель**:
 

@@ -1,0 +1,913 @@
+PS C:\Users\RAZRULETEL\WebstormProjects\processor> cat programs/hello.lisp
+(
+    (print "Hello, world!")
+)
+PS C:\Users\RAZRULETEL\WebstormProjects\processor> npm run translate programs/hello.lisp hello.json
+
+> processor@1.0.0 translate
+> node translator.js programs/hello.lisp hello.json
+
+Parse  false (print "Hello, world!")
+[
+  { line: 0, source: '', opcode: 14, arg: { addressing: 1, value: 3 } },
+  { value: 1 },
+  { value: 2 },
+  { value: 72 },
+  { line: 0, source: '"Hello, world!"', opcode: 23, arg: 58 },
+  {
+    line: 0,
+    source: 'call print_string',
+    opcode: 17,
+    arg: { addressing: 2, value: 21 }
+  },
+  { line: 0, source: '', opcode: 22, arg: 0 },
+  { line: 0, source: 'write null-terminator', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 23, arg: 0 },
+  { line: 0, source: '', opcode: 26, arg: 0 },
+  { line: 0, source: 'push digits to stack', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 7, arg: 10 },
+  { line: 0, source: '', opcode: 3, arg: 48 },
+  { line: 0, source: '', opcode: 26, arg: 0 },
+  { line: 0, source: '', opcode: 6, arg: 10 },
+  {
+    line: 0,
+    source: '',
+    opcode: 16,
+    arg: { addressing: 1, value: -6 }
+  },
+  { line: 0, source: 'write digits to output', opcode: 3, arg: 48 },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 2, value: 1 } },
+  { line: 0, source: '', opcode: 2, arg: 0 },
+  { line: 0, source: '', opcode: 21, arg: 0 },
+  {
+    line: 0,
+    source: '',
+    opcode: 16,
+    arg: { addressing: 1, value: -4 }
+  },
+  { line: 0, source: 'ret from print@number', opcode: 18, arg: 0 },
+  {
+    line: 0,
+    source: 'save string address to stack',
+    opcode: 1,
+    arg: 0
+  },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 4, value: 0 } },
+  { line: 0, source: '', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 3, value: 1 } },
+  { line: 0, source: '', opcode: 19, arg: 0 },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 3, value: 1 } },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 4, value: 0 } },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 2, value: 1 } },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 3, value: 0 } },
+  { line: 0, source: '', opcode: 20, arg: 0 },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 3, value: 0 } },
+  {
+    line: 0,
+    source: '',
+    opcode: 12,
+    arg: { addressing: 1, value: -9 }
+  },
+  { line: 0, source: '', opcode: 2, arg: 0 },
+  { line: 0, source: '', opcode: 2, arg: 0 },
+  { line: 0, source: 'ret from print@string', opcode: 18, arg: 0 },
+  { line: 0, source: '', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 23, arg: 0 },
+  { line: 0, source: '', opcode: 26, arg: 0 },
+  { line: 0, source: '', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 2, arg: 0 },
+  { line: 0, source: '', opcode: 19, arg: 0 },
+  { line: 0, source: '', opcode: 1, arg: 0 },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 2, value: 2 } },
+  { line: 0, source: '', opcode: 21, arg: 10 },
+  { line: 0, source: '', opcode: 13, arg: { addressing: 1, value: 5 } },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 5, value: 0 } },
+  { line: 0, source: '', opcode: 23, arg: { addressing: 3, value: 1 } },
+  { line: 0, source: '', opcode: 19, arg: 0 },
+  { line: 0, source: '', opcode: 24, arg: { addressing: 3, value: 1 } },
+  {
+    line: 0,
+    source: '',
+    opcode: 14,
+    arg: { addressing: 1, value: -11 }
+  },
+  { line: 0, source: '', opcode: 2, arg: 0 },
+  { line: 0, source: '', opcode: 4, arg: { addressing: 3, value: 0 } },
+  { line: 0, source: '', opcode: 26, arg: 0 },
+  {
+    line: 0,
+    source: '',
+    opcode: 24,
+    arg: { addressing: 5, value: -1 }
+  },
+  { line: 0, source: '', opcode: 25, arg: 0 },
+  { line: 0, source: 'ret from read@string', opcode: 18, arg: 0 },
+  { value: 13 },
+  { value: 72 },
+  { value: 101 },
+  { value: 108 },
+  { value: 108 },
+  { value: 111 },
+  { value: 44 },
+  { value: 32 },
+  { value: 119 },
+  { value: 111 },
+  { value: 114 },
+  { value: 108 },
+  { value: 100 },
+  { value: 33 }
+]
+PS C:\Users\RAZRULETEL\WebstormProjects\processor> npm run simulate hello.json hello.json log
+
+> processor@1.0.0 simulate
+> node model/processor.js hello.json hello.json log
+
+Hello, world!
+PS C:\Users\RAZRULETEL\WebstormProjects\processor> cat log
+t: 1, IP: 0, PR: X ACC: 0, BR: 0, SP: 0, DR: 46 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 2, IP: 0, PR: 14 ACC: 0, BR: 0, SP: 0, DR: 46 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 3, IP: 1, PR: 14 ACC: 0, BR: 0, SP: 0, DR: 46 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 4, IP: 4, PR: 14 ACC: 0, BR: 0, SP: 0, DR: 46 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 5, IP: 4, PR: 14 ACC: 0, BR: 0, SP: 0, DR: 14871 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 6, IP: 4, PR: 23 ACC: 0, BR: 0, SP: 0, DR: 14871 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 7, IP: 4, PR: 23 ACC: 0, BR: 58, SP: 0, DR: 14871 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 8, IP: 4, PR: 23 ACC: 58, BR: 58, SP: 0, DR: 14871 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 9, IP: 5, PR: 23 ACC: 58, BR: 58, SP: 0, DR: 14871 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 10, IP: 5, PR: 23 ACC: 58, BR: 58, SP: 0, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 11, IP: 5, PR: 17 ACC: 58, BR: 58, SP: 0, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 12, IP: 5, PR: 17 ACC: 58, BR: 58, SP: 1023, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 13, IP: 5, PR: 17 ACC: 58, BR: 5, SP: 1023, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 14, IP: 1023, PR: 17 ACC: 58, BR: 5, SP: 1023, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 15, IP: 21, PR: 17 ACC: 58, BR: 5, SP: 1023, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 16, IP: 22, PR: 17 ACC: 58, BR: 5, SP: 1023, DR: 81 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 17, IP: 22, PR: 17 ACC: 58, BR: 5, SP: 1023, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 18, IP: 22, PR: 1 ACC: 58, BR: 5, SP: 1023, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 19, IP: 22, PR: 1 ACC: 58, BR: 5, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 20, IP: 22, PR: 1 ACC: 58, BR: 22, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 21, IP: 1022, PR: 1 ACC: 58, BR: 22, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 22, IP: 22, PR: 1 ACC: 58, BR: 22, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 23, IP: 23, PR: 1 ACC: 58, BR: 22, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 24, IP: 23, PR: 1 ACC: 58, BR: 22, SP: 1022, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 25, IP: 23, PR: 23 ACC: 58, BR: 22, SP: 1022, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 26, IP: 23, PR: 23 ACC: 58, BR: 23, SP: 1022, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 27, IP: 58, PR: 23 ACC: 58, BR: 23, SP: 1022, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 28, IP: 58, PR: 23 ACC: 58, BR: 23, SP: 1022, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 29, IP: 23, PR: 23 ACC: 58, BR: 23, SP: 1022, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 30, IP: 23, PR: 23 ACC: 58, BR: 13, SP: 1022, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 31, IP: 23, PR: 23 ACC: 13, BR: 13, SP: 1022, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 32, IP: 24, PR: 23 ACC: 13, BR: 13, SP: 1022, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 33, IP: 24, PR: 23 ACC: 13, BR: 13, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 34, IP: 24, PR: 1 ACC: 13, BR: 13, SP: 1022, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 35, IP: 24, PR: 1 ACC: 13, BR: 13, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 36, IP: 24, PR: 1 ACC: 13, BR: 24, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 37, IP: 1021, PR: 1 ACC: 13, BR: 24, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 38, IP: 24, PR: 1 ACC: 13, BR: 24, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 39, IP: 25, PR: 1 ACC: 13, BR: 24, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 40, IP: 25, PR: 1 ACC: 13, BR: 24, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 41, IP: 25, PR: 23 ACC: 13, BR: 24, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 42, IP: 25, PR: 23 ACC: 13, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 43, IP: 1022, PR: 23 ACC: 13, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 44, IP: 1022, PR: 23 ACC: 13, BR: 25, SP: 1021, DR: 58 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 45, IP: 25, PR: 23 ACC: 13, BR: 25, SP: 1021, DR: 58 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 46, IP: 25, PR: 23 ACC: 13, BR: 58, SP: 1021, DR: 58 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 47, IP: 25, PR: 23 ACC: 58, BR: 58, SP: 1021, DR: 58 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 48, IP: 26, PR: 23 ACC: 58, BR: 58, SP: 1021, DR: 58 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 49, IP: 26, PR: 23 ACC: 58, BR: 58, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 50, IP: 26, PR: 19 ACC: 58, BR: 58, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 51, IP: 26, PR: 19 ACC: 59, BR: 58, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 52, IP: 27, PR: 19 ACC: 59, BR: 58, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 53, IP: 27, PR: 19 ACC: 59, BR: 58, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 54, IP: 27, PR: 24 ACC: 59, BR: 58, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 55, IP: 27, PR: 24 ACC: 59, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 56, IP: 1022, PR: 24 ACC: 59, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 57, IP: 27, PR: 24 ACC: 59, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 58, IP: 28, PR: 24 ACC: 59, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 59, IP: 28, PR: 24 ACC: 59, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 60, IP: 28, PR: 23 ACC: 59, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 61, IP: 28, PR: 23 ACC: 59, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 62, IP: 59, PR: 23 ACC: 59, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 63, IP: 59, PR: 23 ACC: 59, BR: 28, SP: 1021, DR: 72 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 64, IP: 28, PR: 23 ACC: 59, BR: 28, SP: 1021, DR: 72 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 65, IP: 28, PR: 23 ACC: 59, BR: 72, SP: 1021, DR: 72 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 66, IP: 28, PR: 23 ACC: 72, BR: 72, SP: 1021, DR: 72 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 67, IP: 29, PR: 23 ACC: 72, BR: 72, SP: 1021, DR: 72 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 68, IP: 29, PR: 23 ACC: 72, BR: 72, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 69, IP: 29, PR: 24 ACC: 72, BR: 72, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 70, IP: 29, PR: 24 ACC: 72, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 71, IP: 1, PR: 24 ACC: 72, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 72, IP: 29, PR: 24 ACC: 72, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 73, IP: 30, PR: 24 ACC: 72, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 74, IP: 30, PR: 24 ACC: 72, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 75, IP: 30, PR: 23 ACC: 72, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 76, IP: 30, PR: 23 ACC: 72, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 77, IP: 1021, PR: 23 ACC: 72, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 78, IP: 1021, PR: 23 ACC: 72, BR: 30, SP: 1021, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 79, IP: 30, PR: 23 ACC: 72, BR: 30, SP: 1021, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 80, IP: 30, PR: 23 ACC: 72, BR: 13, SP: 1021, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 81, IP: 30, PR: 23 ACC: 13, BR: 13, SP: 1021, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 82, IP: 31, PR: 23 ACC: 13, BR: 13, SP: 1021, DR: 13 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 83, IP: 31, PR: 23 ACC: 13, BR: 13, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 84, IP: 31, PR: 20 ACC: 13, BR: 13, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 85, IP: 31, PR: 20 ACC: 12, BR: 13, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 86, IP: 32, PR: 20 ACC: 12, BR: 13, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 87, IP: 32, PR: 20 ACC: 12, BR: 13, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 88, IP: 32, PR: 24 ACC: 12, BR: 13, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 89, IP: 32, PR: 24 ACC: 12, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 90, IP: 1021, PR: 24 ACC: 12, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 91, IP: 32, PR: 24 ACC: 12, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 92, IP: 33, PR: 24 ACC: 12, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 93, IP: 33, PR: 24 ACC: 12, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 94, IP: 33, PR: 12 ACC: 12, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 95, IP: 34, PR: 12 ACC: 12, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 96, IP: 25, PR: 12 ACC: 12, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 97, IP: 25, PR: 12 ACC: 12, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 98, IP: 25, PR: 23 ACC: 12, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 99, IP: 25, PR: 23 ACC: 12, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 100, IP: 1022, PR: 23 ACC: 12, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 101, IP: 1022, PR: 23 ACC: 12, BR: 25, SP: 1021, DR: 59 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 102, IP: 25, PR: 23 ACC: 12, BR: 25, SP: 1021, DR: 59 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 103, IP: 25, PR: 23 ACC: 12, BR: 59, SP: 1021, DR: 59 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 104, IP: 25, PR: 23 ACC: 59, BR: 59, SP: 1021, DR: 59 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 105, IP: 26, PR: 23 ACC: 59, BR: 59, SP: 1021, DR: 59 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 106, IP: 26, PR: 23 ACC: 59, BR: 59, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 107, IP: 26, PR: 19 ACC: 59, BR: 59, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 108, IP: 26, PR: 19 ACC: 60, BR: 59, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 109, IP: 27, PR: 19 ACC: 60, BR: 59, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 110, IP: 27, PR: 19 ACC: 60, BR: 59, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 111, IP: 27, PR: 24 ACC: 60, BR: 59, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 112, IP: 27, PR: 24 ACC: 60, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 113, IP: 1022, PR: 24 ACC: 60, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 114, IP: 27, PR: 24 ACC: 60, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 115, IP: 28, PR: 24 ACC: 60, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 116, IP: 28, PR: 24 ACC: 60, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 117, IP: 28, PR: 23 ACC: 60, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 118, IP: 28, PR: 23 ACC: 60, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 119, IP: 60, PR: 23 ACC: 60, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 120, IP: 60, PR: 23 ACC: 60, BR: 28, SP: 1021, DR: 101 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 121, IP: 28, PR: 23 ACC: 60, BR: 28, SP: 1021, DR: 101 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 122, IP: 28, PR: 23 ACC: 60, BR: 101, SP: 1021, DR: 101 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 123, IP: 28, PR: 23 ACC: 101, BR: 101, SP: 1021, DR: 101 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 124, IP: 29, PR: 23 ACC: 101, BR: 101, SP: 1021, DR: 101 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 125, IP: 29, PR: 23 ACC: 101, BR: 101, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 126, IP: 29, PR: 24 ACC: 101, BR: 101, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 127, IP: 29, PR: 24 ACC: 101, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 128, IP: 1, PR: 24 ACC: 101, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 129, IP: 29, PR: 24 ACC: 101, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 130, IP: 30, PR: 24 ACC: 101, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 131, IP: 30, PR: 24 ACC: 101, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 132, IP: 30, PR: 23 ACC: 101, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 133, IP: 30, PR: 23 ACC: 101, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 134, IP: 1021, PR: 23 ACC: 101, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 135, IP: 1021, PR: 23 ACC: 101, BR: 30, SP: 1021, DR: 12 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 136, IP: 30, PR: 23 ACC: 101, BR: 30, SP: 1021, DR: 12 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 137, IP: 30, PR: 23 ACC: 101, BR: 12, SP: 1021, DR: 12 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 138, IP: 30, PR: 23 ACC: 12, BR: 12, SP: 1021, DR: 12 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 139, IP: 31, PR: 23 ACC: 12, BR: 12, SP: 1021, DR: 12 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 140, IP: 31, PR: 23 ACC: 12, BR: 12, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 141, IP: 31, PR: 20 ACC: 12, BR: 12, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 142, IP: 31, PR: 20 ACC: 11, BR: 12, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 143, IP: 32, PR: 20 ACC: 11, BR: 12, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 144, IP: 32, PR: 20 ACC: 11, BR: 12, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 145, IP: 32, PR: 24 ACC: 11, BR: 12, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 146, IP: 32, PR: 24 ACC: 11, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 147, IP: 1021, PR: 24 ACC: 11, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 148, IP: 32, PR: 24 ACC: 11, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 149, IP: 33, PR: 24 ACC: 11, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 150, IP: 33, PR: 24 ACC: 11, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 151, IP: 33, PR: 12 ACC: 11, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 152, IP: 34, PR: 12 ACC: 11, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 153, IP: 25, PR: 12 ACC: 11, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 154, IP: 25, PR: 12 ACC: 11, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 155, IP: 25, PR: 23 ACC: 11, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 156, IP: 25, PR: 23 ACC: 11, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 157, IP: 1022, PR: 23 ACC: 11, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 158, IP: 1022, PR: 23 ACC: 11, BR: 25, SP: 1021, DR: 60 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 159, IP: 25, PR: 23 ACC: 11, BR: 25, SP: 1021, DR: 60 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 160, IP: 25, PR: 23 ACC: 11, BR: 60, SP: 1021, DR: 60 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 161, IP: 25, PR: 23 ACC: 60, BR: 60, SP: 1021, DR: 60 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 162, IP: 26, PR: 23 ACC: 60, BR: 60, SP: 1021, DR: 60 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 163, IP: 26, PR: 23 ACC: 60, BR: 60, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 164, IP: 26, PR: 19 ACC: 60, BR: 60, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 165, IP: 26, PR: 19 ACC: 61, BR: 60, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 166, IP: 27, PR: 19 ACC: 61, BR: 60, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 167, IP: 27, PR: 19 ACC: 61, BR: 60, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 168, IP: 27, PR: 24 ACC: 61, BR: 60, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 169, IP: 27, PR: 24 ACC: 61, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 170, IP: 1022, PR: 24 ACC: 61, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 171, IP: 27, PR: 24 ACC: 61, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 172, IP: 28, PR: 24 ACC: 61, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 173, IP: 28, PR: 24 ACC: 61, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 174, IP: 28, PR: 23 ACC: 61, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 175, IP: 28, PR: 23 ACC: 61, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 176, IP: 61, PR: 23 ACC: 61, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 177, IP: 61, PR: 23 ACC: 61, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 178, IP: 28, PR: 23 ACC: 61, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 179, IP: 28, PR: 23 ACC: 61, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 180, IP: 28, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 181, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 182, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 183, IP: 29, PR: 24 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 184, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 185, IP: 1, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 186, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 187, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 188, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 189, IP: 30, PR: 23 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 190, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 191, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 192, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 11 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 193, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 11 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 194, IP: 30, PR: 23 ACC: 108, BR: 11, SP: 1021, DR: 11 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 195, IP: 30, PR: 23 ACC: 11, BR: 11, SP: 1021, DR: 11 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 196, IP: 31, PR: 23 ACC: 11, BR: 11, SP: 1021, DR: 11 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 197, IP: 31, PR: 23 ACC: 11, BR: 11, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 198, IP: 31, PR: 20 ACC: 11, BR: 11, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 199, IP: 31, PR: 20 ACC: 10, BR: 11, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 200, IP: 32, PR: 20 ACC: 10, BR: 11, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 201, IP: 32, PR: 20 ACC: 10, BR: 11, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 202, IP: 32, PR: 24 ACC: 10, BR: 11, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 203, IP: 32, PR: 24 ACC: 10, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 204, IP: 1021, PR: 24 ACC: 10, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 205, IP: 32, PR: 24 ACC: 10, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 206, IP: 33, PR: 24 ACC: 10, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 207, IP: 33, PR: 24 ACC: 10, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 208, IP: 33, PR: 12 ACC: 10, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 209, IP: 34, PR: 12 ACC: 10, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 210, IP: 25, PR: 12 ACC: 10, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 211, IP: 25, PR: 12 ACC: 10, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 212, IP: 25, PR: 23 ACC: 10, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 213, IP: 25, PR: 23 ACC: 10, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 214, IP: 1022, PR: 23 ACC: 10, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 215, IP: 1022, PR: 23 ACC: 10, BR: 25, SP: 1021, DR: 61 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 216, IP: 25, PR: 23 ACC: 10, BR: 25, SP: 1021, DR: 61 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 217, IP: 25, PR: 23 ACC: 10, BR: 61, SP: 1021, DR: 61 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 218, IP: 25, PR: 23 ACC: 61, BR: 61, SP: 1021, DR: 61 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 219, IP: 26, PR: 23 ACC: 61, BR: 61, SP: 1021, DR: 61 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 220, IP: 26, PR: 23 ACC: 61, BR: 61, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 221, IP: 26, PR: 19 ACC: 61, BR: 61, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 222, IP: 26, PR: 19 ACC: 62, BR: 61, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 223, IP: 27, PR: 19 ACC: 62, BR: 61, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 224, IP: 27, PR: 19 ACC: 62, BR: 61, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 225, IP: 27, PR: 24 ACC: 62, BR: 61, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 226, IP: 27, PR: 24 ACC: 62, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 227, IP: 1022, PR: 24 ACC: 62, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 228, IP: 27, PR: 24 ACC: 62, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 229, IP: 28, PR: 24 ACC: 62, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 230, IP: 28, PR: 24 ACC: 62, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 231, IP: 28, PR: 23 ACC: 62, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 232, IP: 28, PR: 23 ACC: 62, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 233, IP: 62, PR: 23 ACC: 62, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 234, IP: 62, PR: 23 ACC: 62, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 235, IP: 28, PR: 23 ACC: 62, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 236, IP: 28, PR: 23 ACC: 62, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 237, IP: 28, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 238, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 239, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 240, IP: 29, PR: 24 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 241, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 242, IP: 1, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 243, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 244, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 245, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 246, IP: 30, PR: 23 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 247, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 248, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 249, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 10 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 250, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 10 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 251, IP: 30, PR: 23 ACC: 108, BR: 10, SP: 1021, DR: 10 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 252, IP: 30, PR: 23 ACC: 10, BR: 10, SP: 1021, DR: 10 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 253, IP: 31, PR: 23 ACC: 10, BR: 10, SP: 1021, DR: 10 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 254, IP: 31, PR: 23 ACC: 10, BR: 10, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 255, IP: 31, PR: 20 ACC: 10, BR: 10, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 256, IP: 31, PR: 20 ACC: 9, BR: 10, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 257, IP: 32, PR: 20 ACC: 9, BR: 10, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 258, IP: 32, PR: 20 ACC: 9, BR: 10, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 259, IP: 32, PR: 24 ACC: 9, BR: 10, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 260, IP: 32, PR: 24 ACC: 9, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 261, IP: 1021, PR: 24 ACC: 9, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 262, IP: 32, PR: 24 ACC: 9, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 263, IP: 33, PR: 24 ACC: 9, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 264, IP: 33, PR: 24 ACC: 9, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 265, IP: 33, PR: 12 ACC: 9, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 266, IP: 34, PR: 12 ACC: 9, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 267, IP: 25, PR: 12 ACC: 9, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 268, IP: 25, PR: 12 ACC: 9, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 269, IP: 25, PR: 23 ACC: 9, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 270, IP: 25, PR: 23 ACC: 9, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 271, IP: 1022, PR: 23 ACC: 9, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 272, IP: 1022, PR: 23 ACC: 9, BR: 25, SP: 1021, DR: 62 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 273, IP: 25, PR: 23 ACC: 9, BR: 25, SP: 1021, DR: 62 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 274, IP: 25, PR: 23 ACC: 9, BR: 62, SP: 1021, DR: 62 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 275, IP: 25, PR: 23 ACC: 62, BR: 62, SP: 1021, DR: 62 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 276, IP: 26, PR: 23 ACC: 62, BR: 62, SP: 1021, DR: 62 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 277, IP: 26, PR: 23 ACC: 62, BR: 62, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 278, IP: 26, PR: 19 ACC: 62, BR: 62, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 279, IP: 26, PR: 19 ACC: 63, BR: 62, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 280, IP: 27, PR: 19 ACC: 63, BR: 62, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 281, IP: 27, PR: 19 ACC: 63, BR: 62, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 282, IP: 27, PR: 24 ACC: 63, BR: 62, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 283, IP: 27, PR: 24 ACC: 63, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 284, IP: 1022, PR: 24 ACC: 63, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 285, IP: 27, PR: 24 ACC: 63, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 286, IP: 28, PR: 24 ACC: 63, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 287, IP: 28, PR: 24 ACC: 63, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 288, IP: 28, PR: 23 ACC: 63, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 289, IP: 28, PR: 23 ACC: 63, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 290, IP: 63, PR: 23 ACC: 63, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 291, IP: 63, PR: 23 ACC: 63, BR: 28, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 292, IP: 28, PR: 23 ACC: 63, BR: 28, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 293, IP: 28, PR: 23 ACC: 63, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 294, IP: 28, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 295, IP: 29, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 296, IP: 29, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 297, IP: 29, PR: 24 ACC: 111, BR: 111, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 298, IP: 29, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 299, IP: 1, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 300, IP: 29, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 301, IP: 30, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 302, IP: 30, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 303, IP: 30, PR: 23 ACC: 111, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 304, IP: 30, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 305, IP: 1021, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 306, IP: 1021, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 9 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 307, IP: 30, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 9 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 308, IP: 30, PR: 23 ACC: 111, BR: 9, SP: 1021, DR: 9 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 309, IP: 30, PR: 23 ACC: 9, BR: 9, SP: 1021, DR: 9 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 310, IP: 31, PR: 23 ACC: 9, BR: 9, SP: 1021, DR: 9 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 311, IP: 31, PR: 23 ACC: 9, BR: 9, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 312, IP: 31, PR: 20 ACC: 9, BR: 9, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 313, IP: 31, PR: 20 ACC: 8, BR: 9, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 314, IP: 32, PR: 20 ACC: 8, BR: 9, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 315, IP: 32, PR: 20 ACC: 8, BR: 9, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 316, IP: 32, PR: 24 ACC: 8, BR: 9, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 317, IP: 32, PR: 24 ACC: 8, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 318, IP: 1021, PR: 24 ACC: 8, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 319, IP: 32, PR: 24 ACC: 8, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 320, IP: 33, PR: 24 ACC: 8, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 321, IP: 33, PR: 24 ACC: 8, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 322, IP: 33, PR: 12 ACC: 8, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 323, IP: 34, PR: 12 ACC: 8, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 324, IP: 25, PR: 12 ACC: 8, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 325, IP: 25, PR: 12 ACC: 8, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 326, IP: 25, PR: 23 ACC: 8, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 327, IP: 25, PR: 23 ACC: 8, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 328, IP: 1022, PR: 23 ACC: 8, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 329, IP: 1022, PR: 23 ACC: 8, BR: 25, SP: 1021, DR: 63 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 330, IP: 25, PR: 23 ACC: 8, BR: 25, SP: 1021, DR: 63 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 331, IP: 25, PR: 23 ACC: 8, BR: 63, SP: 1021, DR: 63 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 332, IP: 25, PR: 23 ACC: 63, BR: 63, SP: 1021, DR: 63 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 333, IP: 26, PR: 23 ACC: 63, BR: 63, SP: 1021, DR: 63 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 334, IP: 26, PR: 23 ACC: 63, BR: 63, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 335, IP: 26, PR: 19 ACC: 63, BR: 63, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 336, IP: 26, PR: 19 ACC: 64, BR: 63, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 337, IP: 27, PR: 19 ACC: 64, BR: 63, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 338, IP: 27, PR: 19 ACC: 64, BR: 63, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 339, IP: 27, PR: 24 ACC: 64, BR: 63, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 340, IP: 27, PR: 24 ACC: 64, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 341, IP: 1022, PR: 24 ACC: 64, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 342, IP: 27, PR: 24 ACC: 64, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 343, IP: 28, PR: 24 ACC: 64, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 344, IP: 28, PR: 24 ACC: 64, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 345, IP: 28, PR: 23 ACC: 64, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 346, IP: 28, PR: 23 ACC: 64, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 347, IP: 64, PR: 23 ACC: 64, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 348, IP: 64, PR: 23 ACC: 64, BR: 28, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 349, IP: 28, PR: 23 ACC: 64, BR: 28, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 350, IP: 28, PR: 23 ACC: 64, BR: 44, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 351, IP: 28, PR: 23 ACC: 44, BR: 44, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 352, IP: 29, PR: 23 ACC: 44, BR: 44, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 353, IP: 29, PR: 23 ACC: 44, BR: 44, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 354, IP: 29, PR: 24 ACC: 44, BR: 44, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 355, IP: 29, PR: 24 ACC: 44, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 356, IP: 1, PR: 24 ACC: 44, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 357, IP: 29, PR: 24 ACC: 44, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 358, IP: 30, PR: 24 ACC: 44, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 359, IP: 30, PR: 24 ACC: 44, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 360, IP: 30, PR: 23 ACC: 44, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 361, IP: 30, PR: 23 ACC: 44, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 362, IP: 1021, PR: 23 ACC: 44, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 363, IP: 1021, PR: 23 ACC: 44, BR: 30, SP: 1021, DR: 8 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 364, IP: 30, PR: 23 ACC: 44, BR: 30, SP: 1021, DR: 8 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 365, IP: 30, PR: 23 ACC: 44, BR: 8, SP: 1021, DR: 8 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 366, IP: 30, PR: 23 ACC: 8, BR: 8, SP: 1021, DR: 8 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 367, IP: 31, PR: 23 ACC: 8, BR: 8, SP: 1021, DR: 8 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 368, IP: 31, PR: 23 ACC: 8, BR: 8, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 369, IP: 31, PR: 20 ACC: 8, BR: 8, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 370, IP: 31, PR: 20 ACC: 7, BR: 8, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 371, IP: 32, PR: 20 ACC: 7, BR: 8, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 372, IP: 32, PR: 20 ACC: 7, BR: 8, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 373, IP: 32, PR: 24 ACC: 7, BR: 8, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 374, IP: 32, PR: 24 ACC: 7, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 375, IP: 1021, PR: 24 ACC: 7, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 376, IP: 32, PR: 24 ACC: 7, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 377, IP: 33, PR: 24 ACC: 7, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 378, IP: 33, PR: 24 ACC: 7, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 379, IP: 33, PR: 12 ACC: 7, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 380, IP: 34, PR: 12 ACC: 7, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 381, IP: 25, PR: 12 ACC: 7, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 382, IP: 25, PR: 12 ACC: 7, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 383, IP: 25, PR: 23 ACC: 7, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 384, IP: 25, PR: 23 ACC: 7, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 385, IP: 1022, PR: 23 ACC: 7, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 386, IP: 1022, PR: 23 ACC: 7, BR: 25, SP: 1021, DR: 64 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 387, IP: 25, PR: 23 ACC: 7, BR: 25, SP: 1021, DR: 64 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 388, IP: 25, PR: 23 ACC: 7, BR: 64, SP: 1021, DR: 64 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 389, IP: 25, PR: 23 ACC: 64, BR: 64, SP: 1021, DR: 64 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 390, IP: 26, PR: 23 ACC: 64, BR: 64, SP: 1021, DR: 64 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 391, IP: 26, PR: 23 ACC: 64, BR: 64, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 392, IP: 26, PR: 19 ACC: 64, BR: 64, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 393, IP: 26, PR: 19 ACC: 65, BR: 64, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 394, IP: 27, PR: 19 ACC: 65, BR: 64, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 395, IP: 27, PR: 19 ACC: 65, BR: 64, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 396, IP: 27, PR: 24 ACC: 65, BR: 64, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 397, IP: 27, PR: 24 ACC: 65, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 398, IP: 1022, PR: 24 ACC: 65, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 399, IP: 27, PR: 24 ACC: 65, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 400, IP: 28, PR: 24 ACC: 65, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 401, IP: 28, PR: 24 ACC: 65, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 402, IP: 28, PR: 23 ACC: 65, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 403, IP: 28, PR: 23 ACC: 65, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 404, IP: 65, PR: 23 ACC: 65, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 405, IP: 65, PR: 23 ACC: 65, BR: 28, SP: 1021, DR: 32 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 406, IP: 28, PR: 23 ACC: 65, BR: 28, SP: 1021, DR: 32 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 407, IP: 28, PR: 23 ACC: 65, BR: 32, SP: 1021, DR: 32 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 408, IP: 28, PR: 23 ACC: 32, BR: 32, SP: 1021, DR: 32 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 409, IP: 29, PR: 23 ACC: 32, BR: 32, SP: 1021, DR: 32 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 410, IP: 29, PR: 23 ACC: 32, BR: 32, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 411, IP: 29, PR: 24 ACC: 32, BR: 32, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 412, IP: 29, PR: 24 ACC: 32, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 413, IP: 1, PR: 24 ACC: 32, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 414, IP: 29, PR: 24 ACC: 32, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 415, IP: 30, PR: 24 ACC: 32, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 416, IP: 30, PR: 24 ACC: 32, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 417, IP: 30, PR: 23 ACC: 32, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 418, IP: 30, PR: 23 ACC: 32, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 419, IP: 1021, PR: 23 ACC: 32, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 420, IP: 1021, PR: 23 ACC: 32, BR: 30, SP: 1021, DR: 7 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 421, IP: 30, PR: 23 ACC: 32, BR: 30, SP: 1021, DR: 7 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 422, IP: 30, PR: 23 ACC: 32, BR: 7, SP: 1021, DR: 7 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 423, IP: 30, PR: 23 ACC: 7, BR: 7, SP: 1021, DR: 7 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 424, IP: 31, PR: 23 ACC: 7, BR: 7, SP: 1021, DR: 7 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 425, IP: 31, PR: 23 ACC: 7, BR: 7, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 426, IP: 31, PR: 20 ACC: 7, BR: 7, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 427, IP: 31, PR: 20 ACC: 6, BR: 7, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 428, IP: 32, PR: 20 ACC: 6, BR: 7, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 429, IP: 32, PR: 20 ACC: 6, BR: 7, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 430, IP: 32, PR: 24 ACC: 6, BR: 7, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 431, IP: 32, PR: 24 ACC: 6, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 432, IP: 1021, PR: 24 ACC: 6, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 433, IP: 32, PR: 24 ACC: 6, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 434, IP: 33, PR: 24 ACC: 6, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 435, IP: 33, PR: 24 ACC: 6, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 436, IP: 33, PR: 12 ACC: 6, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 437, IP: 34, PR: 12 ACC: 6, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 438, IP: 25, PR: 12 ACC: 6, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 439, IP: 25, PR: 12 ACC: 6, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 440, IP: 25, PR: 23 ACC: 6, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 441, IP: 25, PR: 23 ACC: 6, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 442, IP: 1022, PR: 23 ACC: 6, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 443, IP: 1022, PR: 23 ACC: 6, BR: 25, SP: 1021, DR: 65 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 444, IP: 25, PR: 23 ACC: 6, BR: 25, SP: 1021, DR: 65 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 445, IP: 25, PR: 23 ACC: 6, BR: 65, SP: 1021, DR: 65 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 446, IP: 25, PR: 23 ACC: 65, BR: 65, SP: 1021, DR: 65 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 447, IP: 26, PR: 23 ACC: 65, BR: 65, SP: 1021, DR: 65 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 448, IP: 26, PR: 23 ACC: 65, BR: 65, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 449, IP: 26, PR: 19 ACC: 65, BR: 65, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 450, IP: 26, PR: 19 ACC: 66, BR: 65, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 451, IP: 27, PR: 19 ACC: 66, BR: 65, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 452, IP: 27, PR: 19 ACC: 66, BR: 65, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 453, IP: 27, PR: 24 ACC: 66, BR: 65, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 454, IP: 27, PR: 24 ACC: 66, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 455, IP: 1022, PR: 24 ACC: 66, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 456, IP: 27, PR: 24 ACC: 66, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 457, IP: 28, PR: 24 ACC: 66, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 458, IP: 28, PR: 24 ACC: 66, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 459, IP: 28, PR: 23 ACC: 66, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 460, IP: 28, PR: 23 ACC: 66, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 461, IP: 66, PR: 23 ACC: 66, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 462, IP: 66, PR: 23 ACC: 66, BR: 28, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 463, IP: 28, PR: 23 ACC: 66, BR: 28, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 464, IP: 28, PR: 23 ACC: 66, BR: 119, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 465, IP: 28, PR: 23 ACC: 119, BR: 119, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 466, IP: 29, PR: 23 ACC: 119, BR: 119, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 467, IP: 29, PR: 23 ACC: 119, BR: 119, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 468, IP: 29, PR: 24 ACC: 119, BR: 119, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 469, IP: 29, PR: 24 ACC: 119, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 470, IP: 1, PR: 24 ACC: 119, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 471, IP: 29, PR: 24 ACC: 119, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 472, IP: 30, PR: 24 ACC: 119, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 473, IP: 30, PR: 24 ACC: 119, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 474, IP: 30, PR: 23 ACC: 119, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 475, IP: 30, PR: 23 ACC: 119, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 476, IP: 1021, PR: 23 ACC: 119, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 477, IP: 1021, PR: 23 ACC: 119, BR: 30, SP: 1021, DR: 6 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 478, IP: 30, PR: 23 ACC: 119, BR: 30, SP: 1021, DR: 6 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 479, IP: 30, PR: 23 ACC: 119, BR: 6, SP: 1021, DR: 6 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 480, IP: 30, PR: 23 ACC: 6, BR: 6, SP: 1021, DR: 6 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 481, IP: 31, PR: 23 ACC: 6, BR: 6, SP: 1021, DR: 6 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 482, IP: 31, PR: 23 ACC: 6, BR: 6, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 483, IP: 31, PR: 20 ACC: 6, BR: 6, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 484, IP: 31, PR: 20 ACC: 5, BR: 6, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 485, IP: 32, PR: 20 ACC: 5, BR: 6, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 486, IP: 32, PR: 20 ACC: 5, BR: 6, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 487, IP: 32, PR: 24 ACC: 5, BR: 6, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 488, IP: 32, PR: 24 ACC: 5, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 489, IP: 1021, PR: 24 ACC: 5, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 490, IP: 32, PR: 24 ACC: 5, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 491, IP: 33, PR: 24 ACC: 5, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 492, IP: 33, PR: 24 ACC: 5, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 493, IP: 33, PR: 12 ACC: 5, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 494, IP: 34, PR: 12 ACC: 5, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 495, IP: 25, PR: 12 ACC: 5, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 496, IP: 25, PR: 12 ACC: 5, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 497, IP: 25, PR: 23 ACC: 5, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 498, IP: 25, PR: 23 ACC: 5, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 499, IP: 1022, PR: 23 ACC: 5, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 500, IP: 1022, PR: 23 ACC: 5, BR: 25, SP: 1021, DR: 66 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 501, IP: 25, PR: 23 ACC: 5, BR: 25, SP: 1021, DR: 66 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 502, IP: 25, PR: 23 ACC: 5, BR: 66, SP: 1021, DR: 66 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 503, IP: 25, PR: 23 ACC: 66, BR: 66, SP: 1021, DR: 66 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 504, IP: 26, PR: 23 ACC: 66, BR: 66, SP: 1021, DR: 66 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 505, IP: 26, PR: 23 ACC: 66, BR: 66, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 506, IP: 26, PR: 19 ACC: 66, BR: 66, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 507, IP: 26, PR: 19 ACC: 67, BR: 66, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 508, IP: 27, PR: 19 ACC: 67, BR: 66, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 509, IP: 27, PR: 19 ACC: 67, BR: 66, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 510, IP: 27, PR: 24 ACC: 67, BR: 66, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 511, IP: 27, PR: 24 ACC: 67, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 512, IP: 1022, PR: 24 ACC: 67, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 513, IP: 27, PR: 24 ACC: 67, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 514, IP: 28, PR: 24 ACC: 67, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 515, IP: 28, PR: 24 ACC: 67, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 516, IP: 28, PR: 23 ACC: 67, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 517, IP: 28, PR: 23 ACC: 67, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 518, IP: 67, PR: 23 ACC: 67, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 519, IP: 67, PR: 23 ACC: 67, BR: 28, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 520, IP: 28, PR: 23 ACC: 67, BR: 28, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 521, IP: 28, PR: 23 ACC: 67, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 522, IP: 28, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 523, IP: 29, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 111 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 524, IP: 29, PR: 23 ACC: 111, BR: 111, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 525, IP: 29, PR: 24 ACC: 111, BR: 111, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 526, IP: 29, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 527, IP: 1, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 528, IP: 29, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 529, IP: 30, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 530, IP: 30, PR: 24 ACC: 111, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 531, IP: 30, PR: 23 ACC: 111, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 532, IP: 30, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 533, IP: 1021, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 534, IP: 1021, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 5 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 535, IP: 30, PR: 23 ACC: 111, BR: 30, SP: 1021, DR: 5 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 536, IP: 30, PR: 23 ACC: 111, BR: 5, SP: 1021, DR: 5 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 537, IP: 30, PR: 23 ACC: 5, BR: 5, SP: 1021, DR: 5 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 538, IP: 31, PR: 23 ACC: 5, BR: 5, SP: 1021, DR: 5 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 539, IP: 31, PR: 23 ACC: 5, BR: 5, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 540, IP: 31, PR: 20 ACC: 5, BR: 5, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 541, IP: 31, PR: 20 ACC: 4, BR: 5, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 542, IP: 32, PR: 20 ACC: 4, BR: 5, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 543, IP: 32, PR: 20 ACC: 4, BR: 5, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 544, IP: 32, PR: 24 ACC: 4, BR: 5, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 545, IP: 32, PR: 24 ACC: 4, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 546, IP: 1021, PR: 24 ACC: 4, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 547, IP: 32, PR: 24 ACC: 4, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 548, IP: 33, PR: 24 ACC: 4, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 549, IP: 33, PR: 24 ACC: 4, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 550, IP: 33, PR: 12 ACC: 4, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 551, IP: 34, PR: 12 ACC: 4, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 552, IP: 25, PR: 12 ACC: 4, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 553, IP: 25, PR: 12 ACC: 4, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 554, IP: 25, PR: 23 ACC: 4, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 555, IP: 25, PR: 23 ACC: 4, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 556, IP: 1022, PR: 23 ACC: 4, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 557, IP: 1022, PR: 23 ACC: 4, BR: 25, SP: 1021, DR: 67 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 558, IP: 25, PR: 23 ACC: 4, BR: 25, SP: 1021, DR: 67 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 559, IP: 25, PR: 23 ACC: 4, BR: 67, SP: 1021, DR: 67 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 560, IP: 25, PR: 23 ACC: 67, BR: 67, SP: 1021, DR: 67 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 561, IP: 26, PR: 23 ACC: 67, BR: 67, SP: 1021, DR: 67 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 562, IP: 26, PR: 23 ACC: 67, BR: 67, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 563, IP: 26, PR: 19 ACC: 67, BR: 67, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 564, IP: 26, PR: 19 ACC: 68, BR: 67, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 565, IP: 27, PR: 19 ACC: 68, BR: 67, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 566, IP: 27, PR: 19 ACC: 68, BR: 67, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 567, IP: 27, PR: 24 ACC: 68, BR: 67, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 568, IP: 27, PR: 24 ACC: 68, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 569, IP: 1022, PR: 24 ACC: 68, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 570, IP: 27, PR: 24 ACC: 68, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 571, IP: 28, PR: 24 ACC: 68, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 572, IP: 28, PR: 24 ACC: 68, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 573, IP: 28, PR: 23 ACC: 68, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 574, IP: 28, PR: 23 ACC: 68, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 575, IP: 68, PR: 23 ACC: 68, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 576, IP: 68, PR: 23 ACC: 68, BR: 28, SP: 1021, DR: 114 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 577, IP: 28, PR: 23 ACC: 68, BR: 28, SP: 1021, DR: 114 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 578, IP: 28, PR: 23 ACC: 68, BR: 114, SP: 1021, DR: 114 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 579, IP: 28, PR: 23 ACC: 114, BR: 114, SP: 1021, DR: 114 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 580, IP: 29, PR: 23 ACC: 114, BR: 114, SP: 1021, DR: 114 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 581, IP: 29, PR: 23 ACC: 114, BR: 114, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 582, IP: 29, PR: 24 ACC: 114, BR: 114, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 583, IP: 29, PR: 24 ACC: 114, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 584, IP: 1, PR: 24 ACC: 114, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 585, IP: 29, PR: 24 ACC: 114, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 586, IP: 30, PR: 24 ACC: 114, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 587, IP: 30, PR: 24 ACC: 114, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 588, IP: 30, PR: 23 ACC: 114, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 589, IP: 30, PR: 23 ACC: 114, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 590, IP: 1021, PR: 23 ACC: 114, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 591, IP: 1021, PR: 23 ACC: 114, BR: 30, SP: 1021, DR: 4 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 592, IP: 30, PR: 23 ACC: 114, BR: 30, SP: 1021, DR: 4 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 593, IP: 30, PR: 23 ACC: 114, BR: 4, SP: 1021, DR: 4 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 594, IP: 30, PR: 23 ACC: 4, BR: 4, SP: 1021, DR: 4 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 595, IP: 31, PR: 23 ACC: 4, BR: 4, SP: 1021, DR: 4 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 596, IP: 31, PR: 23 ACC: 4, BR: 4, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 597, IP: 31, PR: 20 ACC: 4, BR: 4, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 598, IP: 31, PR: 20 ACC: 3, BR: 4, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 599, IP: 32, PR: 20 ACC: 3, BR: 4, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 600, IP: 32, PR: 20 ACC: 3, BR: 4, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 601, IP: 32, PR: 24 ACC: 3, BR: 4, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 602, IP: 32, PR: 24 ACC: 3, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 603, IP: 1021, PR: 24 ACC: 3, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 604, IP: 32, PR: 24 ACC: 3, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 605, IP: 33, PR: 24 ACC: 3, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 606, IP: 33, PR: 24 ACC: 3, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 607, IP: 33, PR: 12 ACC: 3, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 608, IP: 34, PR: 12 ACC: 3, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 609, IP: 25, PR: 12 ACC: 3, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 610, IP: 25, PR: 12 ACC: 3, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 611, IP: 25, PR: 23 ACC: 3, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 612, IP: 25, PR: 23 ACC: 3, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 613, IP: 1022, PR: 23 ACC: 3, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 614, IP: 1022, PR: 23 ACC: 3, BR: 25, SP: 1021, DR: 68 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 615, IP: 25, PR: 23 ACC: 3, BR: 25, SP: 1021, DR: 68 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 616, IP: 25, PR: 23 ACC: 3, BR: 68, SP: 1021, DR: 68 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 617, IP: 25, PR: 23 ACC: 68, BR: 68, SP: 1021, DR: 68 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 618, IP: 26, PR: 23 ACC: 68, BR: 68, SP: 1021, DR: 68 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 619, IP: 26, PR: 23 ACC: 68, BR: 68, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 620, IP: 26, PR: 19 ACC: 68, BR: 68, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 621, IP: 26, PR: 19 ACC: 69, BR: 68, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 622, IP: 27, PR: 19 ACC: 69, BR: 68, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 623, IP: 27, PR: 19 ACC: 69, BR: 68, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 624, IP: 27, PR: 24 ACC: 69, BR: 68, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 625, IP: 27, PR: 24 ACC: 69, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 626, IP: 1022, PR: 24 ACC: 69, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 627, IP: 27, PR: 24 ACC: 69, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 628, IP: 28, PR: 24 ACC: 69, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 629, IP: 28, PR: 24 ACC: 69, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 630, IP: 28, PR: 23 ACC: 69, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 631, IP: 28, PR: 23 ACC: 69, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 632, IP: 69, PR: 23 ACC: 69, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 633, IP: 69, PR: 23 ACC: 69, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 634, IP: 28, PR: 23 ACC: 69, BR: 28, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 635, IP: 28, PR: 23 ACC: 69, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 636, IP: 28, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 637, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 108 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 638, IP: 29, PR: 23 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 639, IP: 29, PR: 24 ACC: 108, BR: 108, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 640, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 641, IP: 1, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 642, IP: 29, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 643, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 644, IP: 30, PR: 24 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 645, IP: 30, PR: 23 ACC: 108, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 646, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 647, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 648, IP: 1021, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 3 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 649, IP: 30, PR: 23 ACC: 108, BR: 30, SP: 1021, DR: 3 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 650, IP: 30, PR: 23 ACC: 108, BR: 3, SP: 1021, DR: 3 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 651, IP: 30, PR: 23 ACC: 3, BR: 3, SP: 1021, DR: 3 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 652, IP: 31, PR: 23 ACC: 3, BR: 3, SP: 1021, DR: 3 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 653, IP: 31, PR: 23 ACC: 3, BR: 3, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 654, IP: 31, PR: 20 ACC: 3, BR: 3, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 655, IP: 31, PR: 20 ACC: 2, BR: 3, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 656, IP: 32, PR: 20 ACC: 2, BR: 3, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 657, IP: 32, PR: 20 ACC: 2, BR: 3, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 658, IP: 32, PR: 24 ACC: 2, BR: 3, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 659, IP: 32, PR: 24 ACC: 2, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 660, IP: 1021, PR: 24 ACC: 2, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 661, IP: 32, PR: 24 ACC: 2, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 662, IP: 33, PR: 24 ACC: 2, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 663, IP: 33, PR: 24 ACC: 2, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 664, IP: 33, PR: 12 ACC: 2, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 665, IP: 34, PR: 12 ACC: 2, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 666, IP: 25, PR: 12 ACC: 2, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 667, IP: 25, PR: 12 ACC: 2, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 668, IP: 25, PR: 23 ACC: 2, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 669, IP: 25, PR: 23 ACC: 2, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 670, IP: 1022, PR: 23 ACC: 2, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 671, IP: 1022, PR: 23 ACC: 2, BR: 25, SP: 1021, DR: 69 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 672, IP: 25, PR: 23 ACC: 2, BR: 25, SP: 1021, DR: 69 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 673, IP: 25, PR: 23 ACC: 2, BR: 69, SP: 1021, DR: 69 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 674, IP: 25, PR: 23 ACC: 69, BR: 69, SP: 1021, DR: 69 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 675, IP: 26, PR: 23 ACC: 69, BR: 69, SP: 1021, DR: 69 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 676, IP: 26, PR: 23 ACC: 69, BR: 69, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 677, IP: 26, PR: 19 ACC: 69, BR: 69, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 678, IP: 26, PR: 19 ACC: 70, BR: 69, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 679, IP: 27, PR: 19 ACC: 70, BR: 69, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 680, IP: 27, PR: 19 ACC: 70, BR: 69, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 681, IP: 27, PR: 24 ACC: 70, BR: 69, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 682, IP: 27, PR: 24 ACC: 70, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 683, IP: 1022, PR: 24 ACC: 70, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 684, IP: 27, PR: 24 ACC: 70, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 685, IP: 28, PR: 24 ACC: 70, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 686, IP: 28, PR: 24 ACC: 70, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 687, IP: 28, PR: 23 ACC: 70, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 688, IP: 28, PR: 23 ACC: 70, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 689, IP: 70, PR: 23 ACC: 70, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 690, IP: 70, PR: 23 ACC: 70, BR: 28, SP: 1021, DR: 100 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 691, IP: 28, PR: 23 ACC: 70, BR: 28, SP: 1021, DR: 100 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 692, IP: 28, PR: 23 ACC: 70, BR: 100, SP: 1021, DR: 100 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 693, IP: 28, PR: 23 ACC: 100, BR: 100, SP: 1021, DR: 100 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 694, IP: 29, PR: 23 ACC: 100, BR: 100, SP: 1021, DR: 100 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 695, IP: 29, PR: 23 ACC: 100, BR: 100, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 696, IP: 29, PR: 24 ACC: 100, BR: 100, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 697, IP: 29, PR: 24 ACC: 100, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 698, IP: 1, PR: 24 ACC: 100, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 699, IP: 29, PR: 24 ACC: 100, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 700, IP: 30, PR: 24 ACC: 100, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 701, IP: 30, PR: 24 ACC: 100, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 702, IP: 30, PR: 23 ACC: 100, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 703, IP: 30, PR: 23 ACC: 100, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 704, IP: 1021, PR: 23 ACC: 100, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 705, IP: 1021, PR: 23 ACC: 100, BR: 30, SP: 1021, DR: 2 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 706, IP: 30, PR: 23 ACC: 100, BR: 30, SP: 1021, DR: 2 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 707, IP: 30, PR: 23 ACC: 100, BR: 2, SP: 1021, DR: 2 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 708, IP: 30, PR: 23 ACC: 2, BR: 2, SP: 1021, DR: 2 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 709, IP: 31, PR: 23 ACC: 2, BR: 2, SP: 1021, DR: 2 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 710, IP: 31, PR: 23 ACC: 2, BR: 2, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 711, IP: 31, PR: 20 ACC: 2, BR: 2, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 712, IP: 31, PR: 20 ACC: 1, BR: 2, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 713, IP: 32, PR: 20 ACC: 1, BR: 2, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 714, IP: 32, PR: 20 ACC: 1, BR: 2, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 715, IP: 32, PR: 24 ACC: 1, BR: 2, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 716, IP: 32, PR: 24 ACC: 1, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 717, IP: 1021, PR: 24 ACC: 1, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 718, IP: 32, PR: 24 ACC: 1, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 719, IP: 33, PR: 24 ACC: 1, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 720, IP: 33, PR: 24 ACC: 1, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 721, IP: 33, PR: 12 ACC: 1, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 722, IP: 34, PR: 12 ACC: 1, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 723, IP: 25, PR: 12 ACC: 1, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 724, IP: 25, PR: 12 ACC: 1, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 725, IP: 25, PR: 23 ACC: 1, BR: 32, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 726, IP: 25, PR: 23 ACC: 1, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 727, IP: 1022, PR: 23 ACC: 1, BR: 25, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 728, IP: 1022, PR: 23 ACC: 1, BR: 25, SP: 1021, DR: 70 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 729, IP: 25, PR: 23 ACC: 1, BR: 25, SP: 1021, DR: 70 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 730, IP: 25, PR: 23 ACC: 1, BR: 70, SP: 1021, DR: 70 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 731, IP: 25, PR: 23 ACC: 70, BR: 70, SP: 1021, DR: 70 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 732, IP: 26, PR: 23 ACC: 70, BR: 70, SP: 1021, DR: 70 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 733, IP: 26, PR: 23 ACC: 70, BR: 70, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 734, IP: 26, PR: 19 ACC: 70, BR: 70, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 1 V: 0 C: 0
+t: 735, IP: 26, PR: 19 ACC: 71, BR: 70, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 736, IP: 27, PR: 19 ACC: 71, BR: 70, SP: 1021, DR: 19 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 737, IP: 27, PR: 19 ACC: 71, BR: 70, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 738, IP: 27, PR: 24 ACC: 71, BR: 70, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 739, IP: 27, PR: 24 ACC: 71, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 740, IP: 1022, PR: 24 ACC: 71, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 741, IP: 27, PR: 24 ACC: 71, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 742, IP: 28, PR: 24 ACC: 71, BR: 27, SP: 1021, DR: 120 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 743, IP: 28, PR: 24 ACC: 71, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 744, IP: 28, PR: 23 ACC: 71, BR: 27, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 745, IP: 28, PR: 23 ACC: 71, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 746, IP: 71, PR: 23 ACC: 71, BR: 28, SP: 1021, DR: 151 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 747, IP: 71, PR: 23 ACC: 71, BR: 28, SP: 1021, DR: 33 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 748, IP: 28, PR: 23 ACC: 71, BR: 28, SP: 1021, DR: 33 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 749, IP: 28, PR: 23 ACC: 71, BR: 33, SP: 1021, DR: 33 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 750, IP: 28, PR: 23 ACC: 33, BR: 33, SP: 1021, DR: 33 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 751, IP: 29, PR: 23 ACC: 33, BR: 33, SP: 1021, DR: 33 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 752, IP: 29, PR: 23 ACC: 33, BR: 33, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 753, IP: 29, PR: 24 ACC: 33, BR: 33, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 754, IP: 29, PR: 24 ACC: 33, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 755, IP: 1, PR: 24 ACC: 33, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 756, IP: 29, PR: 24 ACC: 33, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 757, IP: 30, PR: 24 ACC: 33, BR: 29, SP: 1021, DR: 88 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 758, IP: 30, PR: 24 ACC: 33, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 759, IP: 30, PR: 23 ACC: 33, BR: 29, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 760, IP: 30, PR: 23 ACC: 33, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 761, IP: 1021, PR: 23 ACC: 33, BR: 30, SP: 1021, DR: 119 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 762, IP: 1021, PR: 23 ACC: 33, BR: 30, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 763, IP: 30, PR: 23 ACC: 33, BR: 30, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 764, IP: 30, PR: 23 ACC: 33, BR: 1, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 765, IP: 30, PR: 23 ACC: 1, BR: 1, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 766, IP: 31, PR: 23 ACC: 1, BR: 1, SP: 1021, DR: 1 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 767, IP: 31, PR: 23 ACC: 1, BR: 1, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 768, IP: 31, PR: 20 ACC: 1, BR: 1, SP: 1021, DR: 20 , ZR: 0, N: 0 Z: 0 V: 0 C: 0
+t: 769, IP: 31, PR: 20 ACC: 0, BR: 1, SP: 1021, DR: 20 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 770, IP: 32, PR: 20 ACC: 0, BR: 1, SP: 1021, DR: 20 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 771, IP: 32, PR: 20 ACC: 0, BR: 1, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 772, IP: 32, PR: 24 ACC: 0, BR: 1, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 773, IP: 32, PR: 24 ACC: 0, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 774, IP: 1021, PR: 24 ACC: 0, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 775, IP: 32, PR: 24 ACC: 0, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 776, IP: 33, PR: 24 ACC: 0, BR: 32, SP: 1021, DR: 120 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 777, IP: 33, PR: 24 ACC: 0, BR: 32, SP: 1021, DR: 44 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 799, IP: 36, PR: 2 ACC: 71, BR: 71, SP: 1023, DR: 71 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 800, IP: 36, PR: 2 ACC: 71, BR: 71, SP: 1023, DR: 18 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 801, IP: 36, PR: 18 ACC: 71, BR: 71, SP: 1023, DR: 18 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 802, IP: 1023, PR: 18 ACC: 71, BR: 71, SP: 1023, DR: 18 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 803, IP: 1023, PR: 18 ACC: 71, BR: 71, SP: 1023, DR: 5 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 804, IP: 5, PR: 18 ACC: 71, BR: 71, SP: 1023, DR: 5 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 805, IP: 5, PR: 18 ACC: 71, BR: 71, SP: 0, DR: 5 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 806, IP: 6, PR: 18 ACC: 71, BR: 71, SP: 0, DR: 5 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 807, IP: 6, PR: 18 ACC: 71, BR: 71, SP: 0, DR: 22 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
+t: 808, IP: 6, PR: 22 ACC: 71, BR: 71, SP: 0, DR: 22 , ZR: 0, N: 1 Z: 0 V: 1 C: 0
