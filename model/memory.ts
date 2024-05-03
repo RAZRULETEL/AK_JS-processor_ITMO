@@ -2,11 +2,11 @@ import {Data, Instruction, instruction_to_data} from "../byte-code";
 
 export class MemoryStorage {
     readonly memory_size: number;
-    private storage: Array<Instruction | Data> = [];
-    private readonly output: number;
-    private readonly input: number;
-    private input_buffer: number[] = [];
-    private output_buffer: number[] = [];
+    protected storage: Array<Instruction | Data> = [];
+    protected readonly output: number;
+    protected readonly input: number;
+    protected input_buffer: number[] = [];
+    protected output_buffer: number[] = [];
 
     constructor(memory_size: number, storage: {program: Array<Instruction | Data>, input: number, output: number}) {
         if (memory_size <= 0)
@@ -19,7 +19,7 @@ export class MemoryStorage {
         this.input = storage.input;
     }
 
-    get(address: number): Instruction | Data {
+    get(address: number, time_callback: () => void): Instruction | Data {
         if (address < 0 || address >= this.memory_size)
             throw new Error(`Invalid address: ${address}`);
         if (address === this.input) {
@@ -28,6 +28,7 @@ export class MemoryStorage {
                 return {value};
             throw new Error("Input buffer is empty");
         }
+        time_callback();
         return this.storage[address];
     }
 

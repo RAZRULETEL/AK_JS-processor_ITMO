@@ -102,8 +102,7 @@ export class Processor {
     }
 
     private latch_data_register(){
-        this.registers.DR = this.storage.get(this.registers.IP);
-        this.tick();
+        this.registers.DR = this.storage.get(this.registers.IP, () => {this.tick()});
     }
 
     private latch_memory(operation: AluOperation){
@@ -295,7 +294,7 @@ export class Processor {
     get_state(): string{
         const flags = `N: ${this.flags.Negative} Z: ${this.flags.Zero} V: ${this.flags.Overflow} C: ${this.flags.Carry}`;
         const DR = ("opcode" in this.registers.DR ? instruction_to_data(this.registers.DR) : this.registers.DR).value;
-        return `t: ${this.time}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "X"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, DR: ${DR} , ZR: ${this.registers.ZR}, ${flags}`
+        return `t: ${this.time}, IP: ${this.registers.IP}, PR: ${this.registers.PR?.opcode || "X"} ACC: ${this.registers.ACC}, BR: ${this.registers.BR}, SP: ${this.registers.SP}, DR: ${DR}, ZR: ${this.registers.ZR}, ${flags}`
     }
     
     start_simulation(time_limit: number) {
