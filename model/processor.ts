@@ -17,11 +17,13 @@ import fs from "fs";
 
 
 export const REGISTER_BITS_SIZE = 32;
+
 const INPUT_FILE_ARG = 2;
 const STDIN_FILE_ARG = 3;
 const LOG_FILE_ARG = 4;
 const TIME_LIMIT_ARG = 5;
 
+// const CACHE_LINES_COUNT = 4;
 const MEMORY_SIZE = 1024;
 const PROB1_TIME_LIMIT = 1_000_000;
 
@@ -341,6 +343,7 @@ if(program_code_file) {
 // eslint-disable-next-line max-params
 export function simulate(program: SourceProgram, stdin: string, time_limit: number, log_file?: string) {
     const memory = new MemoryStorage(MEMORY_SIZE, program);
+    // const memory = new MemoryStorageCache(MEMORY_SIZE, program, CACHE_LINES_COUNT);
     memory.add_input(...stdin.split("").map(char => char.charCodeAt(0)));
 
     const logger = new Logger(LogLevel.Tick);

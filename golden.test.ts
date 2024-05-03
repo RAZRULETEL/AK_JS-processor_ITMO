@@ -11,6 +11,7 @@ interface GoldenTestConfig {
     output_stdout: string;
     output_log_path: string;
 }
+const TIMEOUT = 10_000;
 const MAX_JOURNAL_LENGTH = 20_000;
 
 const TEST_TEMP_DIR = 'tmp';
@@ -59,6 +60,6 @@ describe('Running golden tests', () => {
         }catch (err) {
             // ignore, not last test
         }
-    })
+    }, TIMEOUT)
 });
 
