@@ -191,7 +191,8 @@
 ## Транслятор
 
 Интерфейс командной строки: </br>
-`node translator.js <input file> <output file>`
+`node translator.js <input file> <output file>` </br>
+[translator.ts](./translator.ts)
 
 **Трансляция происходит в два этапа:**
 + создание последовательности инструкций;
@@ -207,16 +208,21 @@
 ## Процессор
 
 Интерфейс командной строки: </br>
-`node processor.js <program_code_file> <stdin_file> <stdout_file> <time_limit>`
+`node processor.js <program_code_file> <stdin_file> <stdout_file> <time_limit>` </br>
+[processor.ts](./model/processor.ts)
 
 <img src="./processor_scheme.jpg" alt="">
 
 ### DataPath
 
-Сигналы (обрабатываются за один такт, реализованы в виде методов класса):
+**Сигналы** (обрабатываются за один такт, реализованы в виде методов класса):
 
-`latch_data_register` -- защёлкнуть в `DR` выход памяти данных;
-`latch_memory` -- записать значение аккумулятора в память.
++ `latch_data_register` -- защёлкнуть в `DR` выход памяти данных;
++ `latch_memory` -- записать значение аккумулятора в память;
++ `latch_instruction_pointer` -- защёлкнуть в `IP` выход АЛУ;
++ `latch_accumulator` -- защёлкнуть в `ACC` выход АЛУ;
++ `latch_stack_pointer` -- защёлкнуть в `SP` выход АЛУ;
++ `latch_buffer_register` -- защёлкнуть в `BR` выход АЛУ.
 
 Чтение и запись в память производится по адресу в `IP`.
 
@@ -226,13 +232,7 @@ Hardwired (реализовано полностью на TypeScript). </br>
 Метод `start_simulation` моделирует выполнение полного цикла программы.
 
 **Сигналы:**
-+ `latch_instruction_pointer`
-+ `latch_accumulator`
-+ `latch_stack_pointer`
-+ `latch_buffer_register`
 + `latch_program_register`
-
-Сигналы защёлкивают определённый регистр значением из АЛУ.
 
 **Особенности работы модели:**
 
@@ -256,6 +256,7 @@ Hardwired (реализовано полностью на TypeScript). </br>
 
 ## Тестирование
 
+[golden.test.ts](./golden.test.ts) </br>
 GitHub Actions: [node.js.yml](./.github/workflows/node.js.yml)
 
 Где:
@@ -297,6 +298,8 @@ Ran all test suites.
 + 4 линии
 + политика вытеснения: random
 + политика записи: write-through
+
+[memory-cache.ts](./model/memory-cache.ts)
 
 <img src="./cache_scheme.jpg" alt="">
 
